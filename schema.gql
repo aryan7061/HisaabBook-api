@@ -1,0 +1,721 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  jobTitle: String
+  phone: String
+  role: Role!
+  timezone: String
+  avatarUrl: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+enum Role {
+  ADMIN
+  SALES_MANAGER
+  SALES_PERSON
+  SALES_INTERN
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type DeleteManyResponse {
+  """The number of records deleted."""
+  deletedCount: Int!
+}
+
+type UserDeleteResponse {
+  id: ID
+  name: String
+  email: String
+  jobTitle: String
+  phone: String
+  role: Role
+  timezone: String
+  avatarUrl: String
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+type UpdateManyResponse {
+  """The number of records updated."""
+  updatedCount: Int!
+}
+
+type OffsetPageInfo {
+  """true if paging forward and there are more records."""
+  hasNextPage: Boolean
+
+  """true if paging backwards and there are more records."""
+  hasPreviousPage: Boolean
+}
+
+type UserConnection {
+  """Paging information"""
+  pageInfo: OffsetPageInfo!
+
+  """Array of nodes."""
+  nodes: [User!]!
+
+  """Fetch total count of records"""
+  totalCount: Int!
+}
+
+type Company {
+  id: ID!
+  name: String!
+  avatarUrl: String
+  companySize: CompanySize
+  totalRevenue: Float
+  businessType: BusinessType
+  country: String
+  website: String
+  salesOwnerId: String!
+  createdById: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  salesOwner: User!
+  createdBy: User
+}
+
+enum CompanySize {
+  SMALL
+  MEDIUM
+  LARGE
+  ENTERPRISE
+}
+
+enum BusinessType {
+  B2B
+  B2C
+  B2G
+}
+
+type CompanyDeleteResponse {
+  id: ID
+  name: String
+  avatarUrl: String
+  companySize: CompanySize
+  totalRevenue: Float
+  businessType: BusinessType
+  country: String
+  website: String
+  salesOwnerId: String
+  createdById: String
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+type CompanyConnection {
+  """Paging information"""
+  pageInfo: OffsetPageInfo!
+
+  """Array of nodes."""
+  nodes: [Company!]!
+
+  """Fetch total count of records"""
+  totalCount: Int!
+}
+
+type CompanyAggregateGroupBy {
+  id: ID
+  name: String
+  avatarUrl: String
+  companySize: CompanySize
+  totalRevenue: Float
+  businessType: BusinessType
+  country: String
+  website: String
+  salesOwnerId: String
+  createdById: String
+  createdAt(by: GroupBy! = DAY): DateTime
+  updatedAt(by: GroupBy! = DAY): DateTime
+}
+
+"""Group by"""
+enum GroupBy {
+  DAY
+  WEEK
+  MONTH
+  YEAR
+}
+
+type CompanyCountAggregate {
+  id: Int
+  name: Int
+  avatarUrl: Int
+  companySize: Int
+  totalRevenue: Int
+  businessType: Int
+  country: Int
+  website: Int
+  salesOwnerId: Int
+  createdById: Int
+  createdAt: Int
+  updatedAt: Int
+}
+
+type CompanySumAggregate {
+  totalRevenue: Float
+}
+
+type CompanyAvgAggregate {
+  totalRevenue: Float
+}
+
+type CompanyMinAggregate {
+  id: ID
+  name: String
+  avatarUrl: String
+  companySize: CompanySize
+  totalRevenue: Float
+  businessType: BusinessType
+  country: String
+  website: String
+  salesOwnerId: String
+  createdById: String
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+type CompanyMaxAggregate {
+  id: ID
+  name: String
+  avatarUrl: String
+  companySize: CompanySize
+  totalRevenue: Float
+  businessType: BusinessType
+  country: String
+  website: String
+  salesOwnerId: String
+  createdById: String
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+type CompanyAggregateResponse {
+  groupBy: CompanyAggregateGroupBy
+  count: CompanyCountAggregate
+  sum: CompanySumAggregate
+  avg: CompanyAvgAggregate
+  min: CompanyMinAggregate
+  max: CompanyMaxAggregate
+}
+
+type Query {
+  user(
+    """The id of the record to find."""
+    id: ID!
+  ): User!
+  users(
+    """Limit or page results."""
+    paging: OffsetPaging! = {limit: 10}
+
+    """Specify to filter the records returned."""
+    filter: UserFilter! = {}
+
+    """Specify to sort results."""
+    sorting: [UserSort!]! = []
+  ): UserConnection!
+  companyAggregate(
+    """Filter to find records to aggregate on"""
+    filter: CompanyAggregateFilter
+  ): [CompanyAggregateResponse!]!
+  company(
+    """The id of the record to find."""
+    id: ID!
+  ): Company!
+  companies(
+    """Limit or page results."""
+    paging: OffsetPaging! = {limit: 10}
+
+    """Specify to filter the records returned."""
+    filter: CompanyFilter! = {}
+
+    """Specify to sort results."""
+    sorting: [CompanySort!]! = []
+  ): CompanyConnection!
+}
+
+input OffsetPaging {
+  """Limit the number of records returned"""
+  limit: Int
+
+  """Offset to start returning records from"""
+  offset: Int
+}
+
+input UserFilter {
+  and: [UserFilter!]
+  or: [UserFilter!]
+  id: IDFilterComparison
+  name: StringFieldComparison
+  email: StringFieldComparison
+  jobTitle: StringFieldComparison
+  phone: StringFieldComparison
+  role: RoleFilterComparison
+  timezone: StringFieldComparison
+  avatarUrl: StringFieldComparison
+  createdAt: DateFieldComparison
+  updatedAt: DateFieldComparison
+}
+
+input IDFilterComparison {
+  is: Boolean
+  isNot: Boolean
+  eq: ID
+  neq: ID
+  gt: ID
+  gte: ID
+  lt: ID
+  lte: ID
+  like: ID
+  notLike: ID
+  iLike: ID
+  notILike: ID
+  in: [ID!]
+  notIn: [ID!]
+}
+
+input StringFieldComparison {
+  is: Boolean
+  isNot: Boolean
+  eq: String
+  neq: String
+  gt: String
+  gte: String
+  lt: String
+  lte: String
+  like: String
+  notLike: String
+  iLike: String
+  notILike: String
+  in: [String!]
+  notIn: [String!]
+}
+
+input RoleFilterComparison {
+  is: Boolean
+  isNot: Boolean
+  eq: Role
+  neq: Role
+  gt: Role
+  gte: Role
+  lt: Role
+  lte: Role
+  like: Role
+  notLike: Role
+  iLike: Role
+  notILike: Role
+  in: [Role!]
+  notIn: [Role!]
+}
+
+input DateFieldComparison {
+  is: Boolean
+  isNot: Boolean
+  eq: DateTime
+  neq: DateTime
+  gt: DateTime
+  gte: DateTime
+  lt: DateTime
+  lte: DateTime
+  in: [DateTime!]
+  notIn: [DateTime!]
+  between: DateFieldComparisonBetween
+  notBetween: DateFieldComparisonBetween
+}
+
+input DateFieldComparisonBetween {
+  lower: DateTime!
+  upper: DateTime!
+}
+
+input UserSort {
+  field: UserSortFields!
+  direction: SortDirection!
+  nulls: SortNulls
+}
+
+enum UserSortFields {
+  id
+  name
+  email
+  jobTitle
+  phone
+  role
+  timezone
+  avatarUrl
+  createdAt
+  updatedAt
+}
+
+"""Sort Directions"""
+enum SortDirection {
+  ASC
+  DESC
+}
+
+"""Sort Nulls Options"""
+enum SortNulls {
+  NULLS_FIRST
+  NULLS_LAST
+}
+
+input CompanyAggregateFilter {
+  and: [CompanyAggregateFilter!]
+  or: [CompanyAggregateFilter!]
+  id: IDFilterComparison
+  name: StringFieldComparison
+  avatarUrl: StringFieldComparison
+  companySize: CompanySizeFilterComparison
+  totalRevenue: NumberFieldComparison
+  businessType: BusinessTypeFilterComparison
+  country: StringFieldComparison
+  website: StringFieldComparison
+  salesOwnerId: StringFieldComparison
+  createdById: StringFieldComparison
+  createdAt: DateFieldComparison
+  updatedAt: DateFieldComparison
+  createdBy: CompanyAggregateFilterUserAggregateFilter
+  salesOwner: CompanyAggregateFilterUserAggregateFilter
+}
+
+input CompanySizeFilterComparison {
+  is: Boolean
+  isNot: Boolean
+  eq: CompanySize
+  neq: CompanySize
+  gt: CompanySize
+  gte: CompanySize
+  lt: CompanySize
+  lte: CompanySize
+  like: CompanySize
+  notLike: CompanySize
+  iLike: CompanySize
+  notILike: CompanySize
+  in: [CompanySize!]
+  notIn: [CompanySize!]
+}
+
+input NumberFieldComparison {
+  is: Boolean
+  isNot: Boolean
+  eq: Float
+  neq: Float
+  gt: Float
+  gte: Float
+  lt: Float
+  lte: Float
+  in: [Float!]
+  notIn: [Float!]
+  between: NumberFieldComparisonBetween
+  notBetween: NumberFieldComparisonBetween
+}
+
+input NumberFieldComparisonBetween {
+  lower: Float!
+  upper: Float!
+}
+
+input BusinessTypeFilterComparison {
+  is: Boolean
+  isNot: Boolean
+  eq: BusinessType
+  neq: BusinessType
+  gt: BusinessType
+  gte: BusinessType
+  lt: BusinessType
+  lte: BusinessType
+  like: BusinessType
+  notLike: BusinessType
+  iLike: BusinessType
+  notILike: BusinessType
+  in: [BusinessType!]
+  notIn: [BusinessType!]
+}
+
+input CompanyAggregateFilterUserAggregateFilter {
+  and: [CompanyAggregateFilterUserAggregateFilter!]
+  or: [CompanyAggregateFilterUserAggregateFilter!]
+  id: IDFilterComparison
+  name: StringFieldComparison
+  email: StringFieldComparison
+  jobTitle: StringFieldComparison
+  phone: StringFieldComparison
+  role: RoleFilterComparison
+  timezone: StringFieldComparison
+  avatarUrl: StringFieldComparison
+  createdAt: DateFieldComparison
+  updatedAt: DateFieldComparison
+}
+
+input CompanyFilter {
+  and: [CompanyFilter!]
+  or: [CompanyFilter!]
+  id: IDFilterComparison
+  name: StringFieldComparison
+  avatarUrl: StringFieldComparison
+  companySize: CompanySizeFilterComparison
+  totalRevenue: NumberFieldComparison
+  businessType: BusinessTypeFilterComparison
+  country: StringFieldComparison
+  website: StringFieldComparison
+  salesOwnerId: StringFieldComparison
+  createdById: StringFieldComparison
+  createdAt: DateFieldComparison
+  updatedAt: DateFieldComparison
+  createdBy: CompanyFilterUserFilter
+  salesOwner: CompanyFilterUserFilter
+}
+
+input CompanyFilterUserFilter {
+  and: [CompanyFilterUserFilter!]
+  or: [CompanyFilterUserFilter!]
+  id: IDFilterComparison
+  name: StringFieldComparison
+  email: StringFieldComparison
+  jobTitle: StringFieldComparison
+  phone: StringFieldComparison
+  role: RoleFilterComparison
+  timezone: StringFieldComparison
+  avatarUrl: StringFieldComparison
+  createdAt: DateFieldComparison
+  updatedAt: DateFieldComparison
+}
+
+input CompanySort {
+  field: CompanySortFields!
+  direction: SortDirection!
+  nulls: SortNulls
+}
+
+enum CompanySortFields {
+  id
+  name
+  avatarUrl
+  companySize
+  totalRevenue
+  businessType
+  country
+  website
+  salesOwnerId
+  createdById
+  createdAt
+  updatedAt
+}
+
+type Mutation {
+  createOneUser(input: CreateOneUserInput!): User!
+  createManyUsers(input: CreateManyUsersInput!): [User!]!
+  updateOneUser(input: UpdateOneUserInput!): User!
+  updateManyUsers(input: UpdateManyUsersInput!): UpdateManyResponse!
+  deleteOneUser(input: DeleteOneUserInput!): UserDeleteResponse!
+  deleteManyUsers(input: DeleteManyUsersInput!): DeleteManyResponse!
+  createOneCompany(input: CreateOneCompanyInput!): Company!
+  createManyCompanies(input: CreateManyCompaniesInput!): [Company!]!
+  updateOneCompany(input: UpdateOneCompanyInput!): Company!
+  updateManyCompanies(input: UpdateManyCompaniesInput!): UpdateManyResponse!
+  deleteOneCompany(input: DeleteOneCompanyInput!): CompanyDeleteResponse!
+  deleteManyCompanies(input: DeleteManyCompaniesInput!): DeleteManyResponse!
+}
+
+input CreateOneUserInput {
+  """The record to create"""
+  user: CreateUser!
+}
+
+input CreateUser {
+  id: ID!
+  name: String!
+  email: String!
+  jobTitle: String
+  phone: String
+  role: Role!
+  timezone: String
+  avatarUrl: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+input CreateManyUsersInput {
+  """Array of records to create"""
+  users: [CreateUser!]!
+}
+
+input UpdateOneUserInput {
+  """The id of the record to update"""
+  id: ID!
+
+  """The update to apply."""
+  update: UpdateUser!
+}
+
+input UpdateUser {
+  id: ID
+  name: String
+  email: String
+  jobTitle: String
+  phone: String
+  role: Role
+  timezone: String
+  avatarUrl: String
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+input UpdateManyUsersInput {
+  """Filter used to find fields to update"""
+  filter: UserUpdateFilter!
+
+  """The update to apply to all records found using the filter"""
+  update: UpdateUser!
+}
+
+input UserUpdateFilter {
+  and: [UserUpdateFilter!]
+  or: [UserUpdateFilter!]
+  id: IDFilterComparison
+  name: StringFieldComparison
+  email: StringFieldComparison
+  jobTitle: StringFieldComparison
+  phone: StringFieldComparison
+  role: RoleFilterComparison
+  timezone: StringFieldComparison
+  avatarUrl: StringFieldComparison
+  createdAt: DateFieldComparison
+  updatedAt: DateFieldComparison
+}
+
+input DeleteOneUserInput {
+  """The id of the record to delete."""
+  id: ID!
+}
+
+input DeleteManyUsersInput {
+  """Filter to find records to delete"""
+  filter: UserDeleteFilter!
+}
+
+input UserDeleteFilter {
+  and: [UserDeleteFilter!]
+  or: [UserDeleteFilter!]
+  id: IDFilterComparison
+  name: StringFieldComparison
+  email: StringFieldComparison
+  jobTitle: StringFieldComparison
+  phone: StringFieldComparison
+  role: RoleFilterComparison
+  timezone: StringFieldComparison
+  avatarUrl: StringFieldComparison
+  createdAt: DateFieldComparison
+  updatedAt: DateFieldComparison
+}
+
+input CreateOneCompanyInput {
+  """The record to create"""
+  company: CreateCompany!
+}
+
+input CreateCompany {
+  id: ID!
+  name: String!
+  avatarUrl: String
+  companySize: CompanySize
+  totalRevenue: Float
+  businessType: BusinessType
+  country: String
+  website: String
+  salesOwnerId: String!
+  createdById: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+input CreateManyCompaniesInput {
+  """Array of records to create"""
+  companies: [CreateCompany!]!
+}
+
+input UpdateOneCompanyInput {
+  """The id of the record to update"""
+  id: ID!
+
+  """The update to apply."""
+  update: UpdateCompany!
+}
+
+input UpdateCompany {
+  id: ID
+  name: String
+  avatarUrl: String
+  companySize: CompanySize
+  totalRevenue: Float
+  businessType: BusinessType
+  country: String
+  website: String
+  salesOwnerId: String
+  createdById: String
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+input UpdateManyCompaniesInput {
+  """Filter used to find fields to update"""
+  filter: CompanyUpdateFilter!
+
+  """The update to apply to all records found using the filter"""
+  update: UpdateCompany!
+}
+
+input CompanyUpdateFilter {
+  and: [CompanyUpdateFilter!]
+  or: [CompanyUpdateFilter!]
+  id: IDFilterComparison
+  name: StringFieldComparison
+  avatarUrl: StringFieldComparison
+  companySize: CompanySizeFilterComparison
+  totalRevenue: NumberFieldComparison
+  businessType: BusinessTypeFilterComparison
+  country: StringFieldComparison
+  website: StringFieldComparison
+  salesOwnerId: StringFieldComparison
+  createdById: StringFieldComparison
+  createdAt: DateFieldComparison
+  updatedAt: DateFieldComparison
+}
+
+input DeleteOneCompanyInput {
+  """The id of the record to delete."""
+  id: ID!
+}
+
+input DeleteManyCompaniesInput {
+  """Filter to find records to delete"""
+  filter: CompanyDeleteFilter!
+}
+
+input CompanyDeleteFilter {
+  and: [CompanyDeleteFilter!]
+  or: [CompanyDeleteFilter!]
+  id: IDFilterComparison
+  name: StringFieldComparison
+  avatarUrl: StringFieldComparison
+  companySize: CompanySizeFilterComparison
+  totalRevenue: NumberFieldComparison
+  businessType: BusinessTypeFilterComparison
+  country: StringFieldComparison
+  website: StringFieldComparison
+  salesOwnerId: StringFieldComparison
+  createdById: StringFieldComparison
+  createdAt: DateFieldComparison
+  updatedAt: DateFieldComparison
+}
