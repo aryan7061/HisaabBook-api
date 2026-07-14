@@ -8,10 +8,16 @@ import {
 import {
   FilterableField,
   FilterableRelation,
+  IDField,
   QueryOptions,
   PagingStrategies,
 } from '@ptc-org/nestjs-query-graphql';
-import { ID, ObjectType, registerEnumType } from '@nestjs/graphql';
+import {
+  ID,
+  ObjectType,
+  GraphQLISODateTime,
+  registerEnumType,
+} from '@nestjs/graphql';
 import { User } from '../users/user.entity';
 
 export enum CompanySize {
@@ -35,7 +41,7 @@ registerEnumType(BusinessType, { name: 'BusinessType' });
 @FilterableRelation('createdBy', () => User, { nullable: true })
 @Entity('companies')
 export class Company {
-  @FilterableField(() => ID)
+  @IDField(() => ID)
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
@@ -75,11 +81,11 @@ export class Company {
   @Column({ name: 'created_by_id', nullable: true })
   createdById?: string;
 
-  @FilterableField()
+  @FilterableField(() => GraphQLISODateTime)
   @CreateDateColumn()
   createdAt!: Date;
 
-  @FilterableField()
+  @FilterableField(() => GraphQLISODateTime)
   @UpdateDateColumn()
   updatedAt!: Date;
 }

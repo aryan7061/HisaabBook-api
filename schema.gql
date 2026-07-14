@@ -210,6 +210,10 @@ type CompanyAggregateResponse {
   max: CompanyMaxAggregate
 }
 
+type AuthResponse {
+  accessToken: String!
+}
+
 type Query {
   user(
     """The id of the record to find."""
@@ -526,29 +530,27 @@ type Mutation {
   updateManyCompanies(input: UpdateManyCompaniesInput!): UpdateManyResponse!
   deleteOneCompany(input: DeleteOneCompanyInput!): CompanyDeleteResponse!
   deleteManyCompanies(input: DeleteManyCompaniesInput!): DeleteManyResponse!
+  register(registerInput: RegisterInput!): User!
+  login(loginInput: LoginInput!): AuthResponse!
 }
 
 input CreateOneUserInput {
   """The record to create"""
-  user: CreateUser!
+  user: CreateUserInput!
 }
 
-input CreateUser {
-  id: ID!
+input CreateUserInput {
   name: String!
   email: String!
   jobTitle: String
   phone: String
   role: Role!
   timezone: String
-  avatarUrl: String
-  createdAt: DateTime!
-  updatedAt: DateTime!
 }
 
 input CreateManyUsersInput {
   """Array of records to create"""
-  users: [CreateUser!]!
+  users: [CreateUserInput!]!
 }
 
 input UpdateOneUserInput {
@@ -556,20 +558,16 @@ input UpdateOneUserInput {
   id: ID!
 
   """The update to apply."""
-  update: UpdateUser!
+  update: UpdateUserInput!
 }
 
-input UpdateUser {
-  id: ID
+input UpdateUserInput {
   name: String
   email: String
   jobTitle: String
   phone: String
   role: Role
   timezone: String
-  avatarUrl: String
-  createdAt: DateTime
-  updatedAt: DateTime
 }
 
 input UpdateManyUsersInput {
@@ -577,7 +575,7 @@ input UpdateManyUsersInput {
   filter: UserUpdateFilter!
 
   """The update to apply to all records found using the filter"""
-  update: UpdateUser!
+  update: UpdateUserInput!
 }
 
 input UserUpdateFilter {
@@ -622,27 +620,22 @@ input UserDeleteFilter {
 
 input CreateOneCompanyInput {
   """The record to create"""
-  company: CreateCompany!
+  company: CreateCompanyInput!
 }
 
-input CreateCompany {
-  id: ID!
+input CreateCompanyInput {
   name: String!
-  avatarUrl: String
   companySize: CompanySize
   totalRevenue: Float
   businessType: BusinessType
   country: String
   website: String
-  salesOwnerId: String!
-  createdById: String
-  createdAt: DateTime!
-  updatedAt: DateTime!
+  salesOwnerId: ID!
 }
 
 input CreateManyCompaniesInput {
   """Array of records to create"""
-  companies: [CreateCompany!]!
+  companies: [CreateCompanyInput!]!
 }
 
 input UpdateOneCompanyInput {
@@ -650,22 +643,17 @@ input UpdateOneCompanyInput {
   id: ID!
 
   """The update to apply."""
-  update: UpdateCompany!
+  update: UpdateCompanyInput!
 }
 
-input UpdateCompany {
-  id: ID
+input UpdateCompanyInput {
   name: String
-  avatarUrl: String
   companySize: CompanySize
   totalRevenue: Float
   businessType: BusinessType
   country: String
   website: String
-  salesOwnerId: String
-  createdById: String
-  createdAt: DateTime
-  updatedAt: DateTime
+  salesOwnerId: ID
 }
 
 input UpdateManyCompaniesInput {
@@ -673,7 +661,7 @@ input UpdateManyCompaniesInput {
   filter: CompanyUpdateFilter!
 
   """The update to apply to all records found using the filter"""
-  update: UpdateCompany!
+  update: UpdateCompanyInput!
 }
 
 input CompanyUpdateFilter {
@@ -718,4 +706,14 @@ input CompanyDeleteFilter {
   createdById: StringFieldComparison
   createdAt: DateFieldComparison
   updatedAt: DateFieldComparison
+}
+
+input RegisterInput {
+  email: String!
+  password: String!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
 }

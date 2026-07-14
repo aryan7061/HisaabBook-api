@@ -5,8 +5,18 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { FilterableField, QueryOptions, PagingStrategies } from '@ptc-org/nestjs-query-graphql';
-import { ID, ObjectType, registerEnumType } from '@nestjs/graphql';
+import {
+  FilterableField,
+  IDField,
+  QueryOptions,
+  PagingStrategies,
+} from '@ptc-org/nestjs-query-graphql';
+import {
+  ID,
+  ObjectType,
+  GraphQLISODateTime,
+  registerEnumType,
+} from '@nestjs/graphql';
 
 export enum Role {
   ADMIN = 'ADMIN',
@@ -20,7 +30,7 @@ registerEnumType(Role, { name: 'Role' });
 @QueryOptions({ pagingStrategy: PagingStrategies.OFFSET })
 @Entity('users')
 export class User {
-  @FilterableField(() => ID)
+  @IDField(() => ID)
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
@@ -55,11 +65,11 @@ export class User {
   @Column({ nullable: true })
   avatarUrl?: string;
 
-  @FilterableField()
+  @FilterableField(() => GraphQLISODateTime)
   @CreateDateColumn()
   createdAt!: Date;
 
-  @FilterableField()
+  @FilterableField(() => GraphQLISODateTime)
   @UpdateDateColumn()
   updatedAt!: Date;
 }
