@@ -214,6 +214,66 @@ type AuthResponse {
   accessToken: String!
 }
 
+type Contact {
+  id: ID!
+  name: String!
+  email: String!
+  phone: String
+  jobTitle: String
+  avatarUrl: String
+  score: Float
+  status: ContactStatus!
+  timezone: String
+  companyId: String!
+  salesOwnerId: String!
+  createdById: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  company: Company!
+  salesOwner: User!
+  createdBy: User
+}
+
+enum ContactStatus {
+  NEW
+  CONTACTED
+  INTERESTED
+  QUALIFIED
+  UNQUALIFIED
+  NEGOTIATION
+  WON
+  LOST
+  CHURNED
+}
+
+type ContactDeleteResponse {
+  id: ID
+  name: String
+  email: String
+  phone: String
+  jobTitle: String
+  avatarUrl: String
+  score: Float
+  status: ContactStatus
+  timezone: String
+  companyId: String
+  salesOwnerId: String
+  createdById: String
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+type ContactConnection {
+  """Paging information"""
+  pageInfo: OffsetPageInfo!
+
+  """Array of nodes."""
+  nodes: [Contact!]!
+
+  """Fetch total count of records"""
+  totalCount: Int!
+}
+
 type Query {
   user(
     """The id of the record to find."""
@@ -247,6 +307,20 @@ type Query {
     """Specify to sort results."""
     sorting: [CompanySort!]! = []
   ): CompanyConnection!
+  contact(
+    """The id of the record to find."""
+    id: ID!
+  ): Contact!
+  contacts(
+    """Limit or page results."""
+    paging: OffsetPaging! = {limit: 10}
+
+    """Specify to filter the records returned."""
+    filter: ContactFilter! = {}
+
+    """Specify to sort results."""
+    sorting: [ContactSort!]! = []
+  ): ContactConnection!
 }
 
 input OffsetPaging {
@@ -517,6 +591,100 @@ enum CompanySortFields {
   updatedAt
 }
 
+input ContactFilter {
+  and: [ContactFilter!]
+  or: [ContactFilter!]
+  id: IDFilterComparison
+  name: StringFieldComparison
+  email: StringFieldComparison
+  phone: StringFieldComparison
+  jobTitle: StringFieldComparison
+  avatarUrl: StringFieldComparison
+  score: NumberFieldComparison
+  status: ContactStatusFilterComparison
+  timezone: StringFieldComparison
+  companyId: StringFieldComparison
+  salesOwnerId: StringFieldComparison
+  createdById: StringFieldComparison
+  createdAt: DateFieldComparison
+  updatedAt: DateFieldComparison
+  createdBy: ContactFilterUserFilter
+  salesOwner: ContactFilterUserFilter
+  company: ContactFilterCompanyFilter
+}
+
+input ContactStatusFilterComparison {
+  is: Boolean
+  isNot: Boolean
+  eq: ContactStatus
+  neq: ContactStatus
+  gt: ContactStatus
+  gte: ContactStatus
+  lt: ContactStatus
+  lte: ContactStatus
+  like: ContactStatus
+  notLike: ContactStatus
+  iLike: ContactStatus
+  notILike: ContactStatus
+  in: [ContactStatus!]
+  notIn: [ContactStatus!]
+}
+
+input ContactFilterUserFilter {
+  and: [ContactFilterUserFilter!]
+  or: [ContactFilterUserFilter!]
+  id: IDFilterComparison
+  name: StringFieldComparison
+  email: StringFieldComparison
+  jobTitle: StringFieldComparison
+  phone: StringFieldComparison
+  role: RoleFilterComparison
+  timezone: StringFieldComparison
+  avatarUrl: StringFieldComparison
+  createdAt: DateFieldComparison
+  updatedAt: DateFieldComparison
+}
+
+input ContactFilterCompanyFilter {
+  and: [ContactFilterCompanyFilter!]
+  or: [ContactFilterCompanyFilter!]
+  id: IDFilterComparison
+  name: StringFieldComparison
+  avatarUrl: StringFieldComparison
+  companySize: CompanySizeFilterComparison
+  totalRevenue: NumberFieldComparison
+  businessType: BusinessTypeFilterComparison
+  country: StringFieldComparison
+  website: StringFieldComparison
+  salesOwnerId: StringFieldComparison
+  createdById: StringFieldComparison
+  createdAt: DateFieldComparison
+  updatedAt: DateFieldComparison
+}
+
+input ContactSort {
+  field: ContactSortFields!
+  direction: SortDirection!
+  nulls: SortNulls
+}
+
+enum ContactSortFields {
+  id
+  name
+  email
+  phone
+  jobTitle
+  avatarUrl
+  score
+  status
+  timezone
+  companyId
+  salesOwnerId
+  createdById
+  createdAt
+  updatedAt
+}
+
 type Mutation {
   createOneUser(input: CreateOneUserInput!): User!
   createManyUsers(input: CreateManyUsersInput!): [User!]!
@@ -532,6 +700,12 @@ type Mutation {
   deleteManyCompanies(input: DeleteManyCompaniesInput!): DeleteManyResponse!
   register(registerInput: RegisterInput!): User!
   login(loginInput: LoginInput!): AuthResponse!
+  createOneContact(input: CreateOneContactInput!): Contact!
+  createManyContacts(input: CreateManyContactsInput!): [Contact!]!
+  updateOneContact(input: UpdateOneContactInput!): Contact!
+  updateManyContacts(input: UpdateManyContactsInput!): UpdateManyResponse!
+  deleteOneContact(input: DeleteOneContactInput!): ContactDeleteResponse!
+  deleteManyContacts(input: DeleteManyContactsInput!): DeleteManyResponse!
 }
 
 input CreateOneUserInput {
@@ -716,4 +890,102 @@ input RegisterInput {
 input LoginInput {
   email: String!
   password: String!
+}
+
+input CreateOneContactInput {
+  """The record to create"""
+  contact: CreateContactInput!
+}
+
+input CreateContactInput {
+  name: String!
+  email: String!
+  phone: String
+  jobTitle: String
+  score: Float
+  status: ContactStatus
+  timezone: String
+  companyId: ID!
+  salesOwnerId: ID!
+}
+
+input CreateManyContactsInput {
+  """Array of records to create"""
+  contacts: [CreateContactInput!]!
+}
+
+input UpdateOneContactInput {
+  """The id of the record to update"""
+  id: ID!
+
+  """The update to apply."""
+  update: UpdateContactInput!
+}
+
+input UpdateContactInput {
+  name: String
+  email: String
+  phone: String
+  jobTitle: String
+  score: Float
+  status: ContactStatus
+  timezone: String
+  companyId: ID
+  salesOwnerId: ID
+}
+
+input UpdateManyContactsInput {
+  """Filter used to find fields to update"""
+  filter: ContactUpdateFilter!
+
+  """The update to apply to all records found using the filter"""
+  update: UpdateContactInput!
+}
+
+input ContactUpdateFilter {
+  and: [ContactUpdateFilter!]
+  or: [ContactUpdateFilter!]
+  id: IDFilterComparison
+  name: StringFieldComparison
+  email: StringFieldComparison
+  phone: StringFieldComparison
+  jobTitle: StringFieldComparison
+  avatarUrl: StringFieldComparison
+  score: NumberFieldComparison
+  status: ContactStatusFilterComparison
+  timezone: StringFieldComparison
+  companyId: StringFieldComparison
+  salesOwnerId: StringFieldComparison
+  createdById: StringFieldComparison
+  createdAt: DateFieldComparison
+  updatedAt: DateFieldComparison
+}
+
+input DeleteOneContactInput {
+  """The id of the record to delete."""
+  id: ID!
+}
+
+input DeleteManyContactsInput {
+  """Filter to find records to delete"""
+  filter: ContactDeleteFilter!
+}
+
+input ContactDeleteFilter {
+  and: [ContactDeleteFilter!]
+  or: [ContactDeleteFilter!]
+  id: IDFilterComparison
+  name: StringFieldComparison
+  email: StringFieldComparison
+  phone: StringFieldComparison
+  jobTitle: StringFieldComparison
+  avatarUrl: StringFieldComparison
+  score: NumberFieldComparison
+  status: ContactStatusFilterComparison
+  timezone: StringFieldComparison
+  companyId: StringFieldComparison
+  salesOwnerId: StringFieldComparison
+  createdById: StringFieldComparison
+  createdAt: DateFieldComparison
+  updatedAt: DateFieldComparison
 }

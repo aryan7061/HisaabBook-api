@@ -21,28 +21,28 @@ import {
   registerEnumType,
 } from '@nestjs/graphql';
 import { User } from '../users/user.entity';
+import { Company } from '../companies/company.entity';
 
-export enum CompanySize {
-  SMALL = 'SMALL',
-  MEDIUM = 'MEDIUM',
-  LARGE = 'LARGE',
-  ENTERPRISE = 'ENTERPRISE',
+export enum ContactStatus {
+  NEW = 'NEW',
+  CONTACTED = 'CONTACTED',
+  INTERESTED = 'INTERESTED',
+  QUALIFIED = 'QUALIFIED',
+  UNQUALIFIED = 'UNQUALIFIED',
+  NEGOTIATION = 'NEGOTIATION',
+  WON = 'WON',
+  LOST = 'LOST',
+  CHURNED = 'CHURNED',
 }
-registerEnumType(CompanySize, { name: 'CompanySize' });
-
-export enum BusinessType {
-  B2B = 'B2B',
-  B2C = 'B2C',
-  B2G = 'B2G',
-}
-registerEnumType(BusinessType, { name: 'BusinessType' });
+registerEnumType(ContactStatus, { name: 'ContactStatus' });
 
 @ObjectType()
 @QueryOptions({ pagingStrategy: PagingStrategies.OFFSET })
+@FilterableRelation('company', () => Company, { nullable: false })
 @FilterableRelation('salesOwner', () => User, { nullable: false })
 @FilterableRelation('createdBy', () => User, { nullable: true })
-@Entity('companies')
-export class Company {
+@Entity('contacts')
+export class Contact {
   @IDField(() => ID)
   @PrimaryGeneratedColumn('uuid')
   id!: string;
@@ -51,29 +51,41 @@ export class Company {
   @Column()
   name!: string;
 
+  @FilterableField()
+  @Column()
+  email!: string;
+
+  @FilterableField({ nullable: true })
+  @Column({ nullable: true })
+  phone?: string;
+
+  @FilterableField({ nullable: true })
+  @Column({ nullable: true })
+  jobTitle?: string;
+
   @FilterableField({ nullable: true })
   @Column({ nullable: true })
   avatarUrl?: string;
 
-  @FilterableField(() => CompanySize, { nullable: true })
-  @Column({ type: 'enum', enum: CompanySize, nullable: true })
-  companySize?: CompanySize;
-
   @FilterableField({ nullable: true })
-  @Column({ type: 'bigint', nullable: true })
-  totalRevenue?: number;
+  @Column({ nullable: true })
+  score?: number;
 
-  @FilterableField(() => BusinessType, { nullable: true })
-  @Column({ type: 'enum', enum: BusinessType, nullable: true })
-  businessType?: BusinessType;
+  @FilterableField(() => ContactStatus)
+  @Column({ type: 'enum', enum: ContactStatus, default: ContactStatus.NEW })
+  status!: ContactStatus;
 
   @FilterableField({ nullable: true })
   @Column({ nullable: true })
-  country?: string;
+  timezone?: string;
 
-  @FilterableField({ nullable: true })
-  @Column({ nullable: true })
-  website?: string;
+  @FilterableField()
+  @Column({ name: 'company_id' })
+  companyId!: string;
+
+  @ManyToOne(() => Company)
+  @JoinColumn({ name: 'company_id' })
+  company!: Company;
 
   @FilterableField()
   @Column({ name: 'sales_owner_id' })
