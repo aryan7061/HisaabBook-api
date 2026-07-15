@@ -3,6 +3,7 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
+  OneToMany,
   JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
@@ -10,6 +11,7 @@ import {
 import {
   FilterableField,
   FilterableRelation,
+  FilterableOffsetConnection,
   IDField,
   QueryOptions,
   PagingStrategies,
@@ -21,6 +23,7 @@ import {
   registerEnumType,
 } from '@nestjs/graphql';
 import { User } from '../users/user.entity';
+import { Deal } from '../deals/deal.entity';
 
 export enum CompanySize {
   SMALL = 'SMALL',
@@ -41,6 +44,7 @@ registerEnumType(BusinessType, { name: 'BusinessType' });
 @QueryOptions({ pagingStrategy: PagingStrategies.OFFSET })
 @FilterableRelation('salesOwner', () => User, { nullable: false })
 @FilterableRelation('createdBy', () => User, { nullable: true })
+@FilterableOffsetConnection('deals', () => Deal, { enableAggregate: true })
 @Entity('companies')
 export class Company {
   @IDField(() => ID)
@@ -98,4 +102,7 @@ export class Company {
   @FilterableField(() => GraphQLISODateTime)
   @UpdateDateColumn()
   updatedAt!: Date;
+
+  @OneToMany(() => Deal, (deal) => deal.company)
+  deals!: Deal[];
 }

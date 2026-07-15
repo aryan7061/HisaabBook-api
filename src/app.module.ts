@@ -11,6 +11,8 @@ import { AuthModule } from './auth/auth.module';
 import { ContactsModule } from './contacts/contacts.module';
 import { TaskStagesModule } from './task-stages/task-stages.module';
 import { TasksModule } from './tasks/tasks.module';
+import { DealStagesModule } from './deal-stages/deal-stages.module';
+import { DealsModule } from './deals/deals.module';
 
 @Module({
   imports: [
@@ -37,6 +39,8 @@ import { TasksModule } from './tasks/tasks.module';
     ContactsModule,
     TaskStagesModule,
     TasksModule,
+    DealStagesModule,
+    DealsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
