@@ -274,6 +274,79 @@ type ContactConnection {
   totalCount: Int!
 }
 
+type TaskStage {
+  id: ID!
+  title: String!
+  createdById: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  createdBy: User
+}
+
+type TaskStageDeleteResponse {
+  id: ID
+  title: String
+  createdById: String
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+type TaskStageConnection {
+  """Paging information"""
+  pageInfo: OffsetPageInfo!
+
+  """Array of nodes."""
+  nodes: [TaskStage!]!
+
+  """Fetch total count of records"""
+  totalCount: Int!
+}
+
+type CheckListItem {
+  title: String!
+  checked: Boolean!
+}
+
+type Task {
+  id: ID!
+  title: String!
+  description: String
+  dueDate: DateTime
+  completed: Boolean!
+  stageId: ID
+  checklist: [CheckListItem!]!
+  createdById: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  users: [User!]!
+  stage: TaskStage
+  createdBy: User
+}
+
+type TaskDeleteResponse {
+  id: ID
+  title: String
+  description: String
+  dueDate: DateTime
+  completed: Boolean
+  stageId: ID
+  checklist: [CheckListItem!]
+  createdById: String
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+type TaskConnection {
+  """Paging information"""
+  pageInfo: OffsetPageInfo!
+
+  """Array of nodes."""
+  nodes: [Task!]!
+
+  """Fetch total count of records"""
+  totalCount: Int!
+}
+
 type Query {
   user(
     """The id of the record to find."""
@@ -321,6 +394,34 @@ type Query {
     """Specify to sort results."""
     sorting: [ContactSort!]! = []
   ): ContactConnection!
+  taskStage(
+    """The id of the record to find."""
+    id: ID!
+  ): TaskStage!
+  taskStages(
+    """Limit or page results."""
+    paging: OffsetPaging! = {limit: 10}
+
+    """Specify to filter the records returned."""
+    filter: TaskStageFilter! = {}
+
+    """Specify to sort results."""
+    sorting: [TaskStageSort!]! = []
+  ): TaskStageConnection!
+  task(
+    """The id of the record to find."""
+    id: ID!
+  ): Task!
+  tasks(
+    """Limit or page results."""
+    paging: OffsetPaging! = {limit: 10}
+
+    """Specify to filter the records returned."""
+    filter: TaskFilter! = {}
+
+    """Specify to sort results."""
+    sorting: [TaskSort!]! = []
+  ): TaskConnection!
 }
 
 input OffsetPaging {
@@ -685,6 +786,110 @@ enum ContactSortFields {
   updatedAt
 }
 
+input TaskStageFilter {
+  and: [TaskStageFilter!]
+  or: [TaskStageFilter!]
+  id: IDFilterComparison
+  title: StringFieldComparison
+  createdById: StringFieldComparison
+  createdAt: DateFieldComparison
+  updatedAt: DateFieldComparison
+  createdBy: TaskStageFilterUserFilter
+}
+
+input TaskStageFilterUserFilter {
+  and: [TaskStageFilterUserFilter!]
+  or: [TaskStageFilterUserFilter!]
+  id: IDFilterComparison
+  name: StringFieldComparison
+  email: StringFieldComparison
+  jobTitle: StringFieldComparison
+  phone: StringFieldComparison
+  role: RoleFilterComparison
+  timezone: StringFieldComparison
+  avatarUrl: StringFieldComparison
+  createdAt: DateFieldComparison
+  updatedAt: DateFieldComparison
+}
+
+input TaskStageSort {
+  field: TaskStageSortFields!
+  direction: SortDirection!
+  nulls: SortNulls
+}
+
+enum TaskStageSortFields {
+  id
+  title
+  createdById
+  createdAt
+  updatedAt
+}
+
+input TaskFilter {
+  and: [TaskFilter!]
+  or: [TaskFilter!]
+  id: IDFilterComparison
+  title: StringFieldComparison
+  description: StringFieldComparison
+  dueDate: DateFieldComparison
+  completed: BooleanFieldComparison
+  stageId: IDFilterComparison
+  createdById: StringFieldComparison
+  createdAt: DateFieldComparison
+  updatedAt: DateFieldComparison
+  createdBy: TaskFilterUserFilter
+  stage: TaskFilterTaskStageFilter
+}
+
+input BooleanFieldComparison {
+  is: Boolean
+  isNot: Boolean
+}
+
+input TaskFilterUserFilter {
+  and: [TaskFilterUserFilter!]
+  or: [TaskFilterUserFilter!]
+  id: IDFilterComparison
+  name: StringFieldComparison
+  email: StringFieldComparison
+  jobTitle: StringFieldComparison
+  phone: StringFieldComparison
+  role: RoleFilterComparison
+  timezone: StringFieldComparison
+  avatarUrl: StringFieldComparison
+  createdAt: DateFieldComparison
+  updatedAt: DateFieldComparison
+}
+
+input TaskFilterTaskStageFilter {
+  and: [TaskFilterTaskStageFilter!]
+  or: [TaskFilterTaskStageFilter!]
+  id: IDFilterComparison
+  title: StringFieldComparison
+  createdById: StringFieldComparison
+  createdAt: DateFieldComparison
+  updatedAt: DateFieldComparison
+}
+
+input TaskSort {
+  field: TaskSortFields!
+  direction: SortDirection!
+  nulls: SortNulls
+}
+
+enum TaskSortFields {
+  id
+  title
+  description
+  dueDate
+  completed
+  stageId
+  createdById
+  createdAt
+  updatedAt
+}
+
 type Mutation {
   createOneUser(input: CreateOneUserInput!): User!
   createManyUsers(input: CreateManyUsersInput!): [User!]!
@@ -706,6 +911,16 @@ type Mutation {
   updateManyContacts(input: UpdateManyContactsInput!): UpdateManyResponse!
   deleteOneContact(input: DeleteOneContactInput!): ContactDeleteResponse!
   deleteManyContacts(input: DeleteManyContactsInput!): DeleteManyResponse!
+  createOneTaskStage(input: CreateOneTaskStageInput!): TaskStage!
+  createManyTaskStages(input: CreateManyTaskStagesInput!): [TaskStage!]!
+  updateOneTaskStage(input: UpdateOneTaskStageInput!): TaskStage!
+  updateManyTaskStages(input: UpdateManyTaskStagesInput!): UpdateManyResponse!
+  deleteOneTaskStage(input: DeleteOneTaskStageInput!): TaskStageDeleteResponse!
+  deleteManyTaskStages(input: DeleteManyTaskStagesInput!): DeleteManyResponse!
+  createOneTask(input: CreateOneTaskInput!): Task!
+  updateOneTask(input: UpdateOneTaskInput!): Task!
+  deleteOneTask(input: DeleteOneTaskInput!): TaskDeleteResponse!
+  deleteManyTasks(input: DeleteManyTasksInput!): DeleteManyResponse!
 }
 
 input CreateOneUserInput {
@@ -985,6 +1200,128 @@ input ContactDeleteFilter {
   timezone: StringFieldComparison
   companyId: StringFieldComparison
   salesOwnerId: StringFieldComparison
+  createdById: StringFieldComparison
+  createdAt: DateFieldComparison
+  updatedAt: DateFieldComparison
+}
+
+input CreateOneTaskStageInput {
+  """The record to create"""
+  taskStage: CreateTaskStageInput!
+}
+
+input CreateTaskStageInput {
+  title: String!
+}
+
+input CreateManyTaskStagesInput {
+  """Array of records to create"""
+  taskStages: [CreateTaskStageInput!]!
+}
+
+input UpdateOneTaskStageInput {
+  """The id of the record to update"""
+  id: ID!
+
+  """The update to apply."""
+  update: UpdateTaskStageInput!
+}
+
+input UpdateTaskStageInput {
+  title: String
+}
+
+input UpdateManyTaskStagesInput {
+  """Filter used to find fields to update"""
+  filter: TaskStageUpdateFilter!
+
+  """The update to apply to all records found using the filter"""
+  update: UpdateTaskStageInput!
+}
+
+input TaskStageUpdateFilter {
+  and: [TaskStageUpdateFilter!]
+  or: [TaskStageUpdateFilter!]
+  id: IDFilterComparison
+  title: StringFieldComparison
+  createdById: StringFieldComparison
+  createdAt: DateFieldComparison
+  updatedAt: DateFieldComparison
+}
+
+input DeleteOneTaskStageInput {
+  """The id of the record to delete."""
+  id: ID!
+}
+
+input DeleteManyTaskStagesInput {
+  """Filter to find records to delete"""
+  filter: TaskStageDeleteFilter!
+}
+
+input TaskStageDeleteFilter {
+  and: [TaskStageDeleteFilter!]
+  or: [TaskStageDeleteFilter!]
+  id: IDFilterComparison
+  title: StringFieldComparison
+  createdById: StringFieldComparison
+  createdAt: DateFieldComparison
+  updatedAt: DateFieldComparison
+}
+
+input CreateOneTaskInput {
+  task: CreateTaskInput!
+}
+
+input CreateTaskInput {
+  title: String!
+  description: String
+  dueDate: String
+  completed: Boolean = false
+  stageId: ID
+  checklist: [ChecklistItemInput!]
+  userIds: [ID!]
+}
+
+input ChecklistItemInput {
+  title: String!
+  checked: Boolean!
+}
+
+input UpdateOneTaskInput {
+  id: ID!
+  update: UpdateTaskInput!
+}
+
+input UpdateTaskInput {
+  title: String
+  description: String
+  dueDate: String
+  completed: Boolean = false
+  stageId: ID
+  checklist: [ChecklistItemInput!]
+  userIds: [ID!]
+}
+
+input DeleteOneTaskInput {
+  """The id of the record to delete."""
+  id: ID!
+}
+
+input DeleteManyTasksInput {
+  """Filter to find records to delete"""
+  filter: TaskDeleteFilter!
+}
+
+input TaskDeleteFilter {
+  and: [TaskDeleteFilter!]
+  or: [TaskDeleteFilter!]
+  id: IDFilterComparison
+  title: StringFieldComparison
+  description: StringFieldComparison
+  dueDate: DateFieldComparison
+  completed: BooleanFieldComparison
+  stageId: IDFilterComparison
   createdById: StringFieldComparison
   createdAt: DateFieldComparison
   updatedAt: DateFieldComparison

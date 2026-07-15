@@ -9,6 +9,8 @@ import { UsersModule } from './users/users.module';
 import { CompaniesModule } from './companies/companies.module';
 import { AuthModule } from './auth/auth.module';
 import { ContactsModule } from './contacts/contacts.module';
+import { TaskStagesModule } from './task-stages/task-stages.module';
+import { TasksModule } from './tasks/tasks.module';
 
 @Module({
   imports: [
@@ -33,6 +35,8 @@ import { ContactsModule } from './contacts/contacts.module';
     CompaniesModule,
     AuthModule,
     ContactsModule,
+    TaskStagesModule,
+    TasksModule,
   ],
   controllers: [AppController],
   providers: [AppService],
