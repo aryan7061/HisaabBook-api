@@ -4,13 +4,14 @@ import { NestjsQueryTypeOrmModule } from '@ptc-org/nestjs-query-typeorm';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Task } from './task.entity';
 import { User } from '../users/user.entity';
+import { Contact } from '../contacts/contact.entity';
 import { CreateTaskInput } from './dto/create-task.input';
 import { UpdateTaskInput } from './dto/update-task.input';
 import { TasksResolver } from './tasks.resolver';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Task, User]),
+    TypeOrmModule.forFeature([Task, User, Contact]),
     NestjsQueryGraphQLModule.forFeature({
       imports: [NestjsQueryTypeOrmModule.forFeature([Task])],
       resolvers: [

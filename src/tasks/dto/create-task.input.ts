@@ -1,8 +1,8 @@
-import { InputType, Field, ID } from '@nestjs/graphql';
+import { InputType, Field, ID, GraphQLISODateTime } from '@nestjs/graphql';
 import {
   IsArray,
   IsBoolean,
-  IsDateString,
+  IsDate,
   IsOptional,
   IsString,
   IsUUID,
@@ -20,10 +20,10 @@ export class CreateTaskInput {
   @IsString()
   description?: string;
 
-  @Field({ nullable: true })
+  @Field(() => GraphQLISODateTime, { nullable: true })
   @IsOptional()
-  @IsDateString()
-  dueDate?: string;
+  @IsDate()
+  dueDate?: Date;
 
   @Field({ nullable: true, defaultValue: false })
   @IsOptional()
@@ -45,4 +45,10 @@ export class CreateTaskInput {
   @IsArray()
   @IsUUID('all', { each: true })
   userIds?: string[];
+
+  @Field(() => [ID], { nullable: true })
+  @IsOptional()
+  @IsArray()
+  @IsUUID('all', { each: true })
+  contactIds?: string[];
 }

@@ -15,6 +15,8 @@ import {
   IDField,
   QueryOptions,
   PagingStrategies,
+  BeforeCreateOne,
+  BeforeCreateMany,
 } from '@ptc-org/nestjs-query-graphql';
 import {
   ID,
@@ -24,6 +26,10 @@ import {
 } from '@nestjs/graphql';
 import { User } from '../users/user.entity';
 import { Deal } from '../deals/deal.entity';
+import {
+  CreatedByCreateOneHook,
+  CreatedByCreateManyHook,
+} from '../common/hooks/created-by.hooks';
 
 export enum CompanySize {
   SMALL = 'SMALL',
@@ -45,6 +51,8 @@ registerEnumType(BusinessType, { name: 'BusinessType' });
 @FilterableRelation('salesOwner', () => User, { nullable: false })
 @FilterableRelation('createdBy', () => User, { nullable: true })
 @FilterableOffsetConnection('deals', () => Deal, { enableAggregate: true })
+@BeforeCreateOne(CreatedByCreateOneHook)
+@BeforeCreateMany(CreatedByCreateManyHook)
 @Entity('companies')
 export class Company {
   @IDField(() => ID)

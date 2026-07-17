@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { GraphQLModule } from '@nestjs/graphql';
@@ -13,6 +14,7 @@ import { TaskStagesModule } from './task-stages/task-stages.module';
 import { TasksModule } from './tasks/tasks.module';
 import { DealStagesModule } from './deal-stages/deal-stages.module';
 import { DealsModule } from './deals/deals.module';
+import { GqlAuthGuard } from './auth/guards/gql-auth.guard';
 
 @Module({
   imports: [
@@ -32,6 +34,7 @@ import { DealsModule } from './deals/deals.module';
       driver: ApolloDriver,
       autoSchemaFile: 'schema.gql',
       playground: true,
+      context: ({ req }) => ({ req }),
     }),
     UsersModule,
     CompaniesModule,
@@ -43,6 +46,12 @@ import { DealsModule } from './deals/deals.module';
     DealsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: GqlAuthGuard,
+    },
+  ],
 })
 export class AppModule {}

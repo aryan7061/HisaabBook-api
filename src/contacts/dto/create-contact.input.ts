@@ -46,9 +46,9 @@ export class CreateContactInput {
   @IsString()
   timezone?: string;
 
-  @Field(() => ID)
-  @IsUUID()
-  companyId!: string;
+  @Field()
+  @IsString()
+  companyName!: string;
 
   @Field(() => ID)
   @IsUUID()

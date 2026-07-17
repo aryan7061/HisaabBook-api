@@ -19,6 +19,7 @@ import {
 import { ID, ObjectType, Field, GraphQLISODateTime } from '@nestjs/graphql';
 import { User } from '../users/user.entity';
 import { TaskStage } from '../task-stages/task-stage.entity';
+import { Contact } from '../contacts/contact.entity';
 import { CheckListItem } from './checklist-item.object';
 
 @ObjectType()
@@ -72,6 +73,16 @@ export class Task {
     inverseJoinColumn: { name: 'user_id' },
   })
   users!: User[];
+
+  // Same pattern as `users` above — custom resolver-managed, written via
+  // a plain `contactIds: string[]`, not nestjs-query's relation setters.
+  @ManyToMany(() => Contact)
+  @JoinTable({
+    name: 'task_contacts',
+    joinColumn: { name: 'task_id' },
+    inverseJoinColumn: { name: 'contact_id' },
+  })
+  contacts!: Contact[];
 
   @FilterableField({ nullable: true })
   @Column({ name: 'created_by_id', nullable: true })

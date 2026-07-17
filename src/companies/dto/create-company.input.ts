@@ -45,4 +45,9 @@ export class CreateCompanyInput {
   @Field(() => ID)
   @IsUUID()
   salesOwnerId!: string;
+
+  @Field(() => ID, { nullable: true })
+  @IsOptional()
+  @IsUUID()
+  createdById?: string;
 }

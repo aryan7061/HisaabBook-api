@@ -4,6 +4,10 @@ import { NestjsQueryTypeOrmModule } from '@ptc-org/nestjs-query-typeorm';
 import { Company } from './company.entity';
 import { CreateCompanyInput } from './dto/create-company.input';
 import { UpdateCompanyInput } from './dto/update-company.input';
+import {
+  CreatedByCreateOneHook,
+  CreatedByCreateManyHook,
+} from '../common/hooks/created-by.hooks';
 
 @Module({
   imports: [
@@ -21,5 +25,6 @@ import { UpdateCompanyInput } from './dto/update-company.input';
       ],
     }),
   ],
+  providers: [CreatedByCreateOneHook, CreatedByCreateManyHook],
 })
 export class CompaniesModule {}

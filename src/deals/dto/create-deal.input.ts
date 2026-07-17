@@ -1,6 +1,6 @@
-import { InputType, Field, ID } from '@nestjs/graphql';
+import { InputType, Field, ID, GraphQLISODateTime } from '@nestjs/graphql';
 import {
-  IsDateString,
+  IsDate,
   IsNumber,
   IsOptional,
   IsString,
@@ -18,10 +18,10 @@ export class CreateDealInput {
   @IsNumber()
   value?: number;
 
-  @Field({ nullable: true })
+  @Field(() => GraphQLISODateTime, { nullable: true })
   @IsOptional()
-  @IsDateString()
-  closeDate?: string;
+  @IsDate()
+  closeDate?: Date;
 
   @Field(() => ID)
   @IsUUID()

@@ -4,6 +4,7 @@ import { NestjsQueryTypeOrmModule } from '@ptc-org/nestjs-query-typeorm';
 import { DealStage } from './deal-stage.entity';
 import { CreateDealStageInput } from './dto/create-deal-stage.input';
 import { UpdateDealStageInput } from './dto/update-deal-stage.input';
+import { CreatedByCreateOneHook } from '../common/hooks/created-by.hooks';
 
 @Module({
   imports: [
@@ -20,5 +21,6 @@ import { UpdateDealStageInput } from './dto/update-deal-stage.input';
       ],
     }),
   ],
+  providers: [CreatedByCreateOneHook],
 })
 export class DealStagesModule {}

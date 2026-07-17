@@ -13,12 +13,14 @@ import {
   IDField,
   QueryOptions,
   PagingStrategies,
+  BeforeCreateOne,
 } from '@ptc-org/nestjs-query-graphql';
-import { ID, ObjectType, GraphQLISODateTime } from '@nestjs/graphql';
+import { ID, ObjectType, GraphQLISODateTime, Int } from '@nestjs/graphql';
 import { User } from '../users/user.entity';
 import { Company } from '../companies/company.entity';
 import { Contact } from '../contacts/contact.entity';
 import { DealStage } from '../deal-stages/deal-stage.entity';
+import { CreatedByCreateOneHook } from '../common/hooks/created-by.hooks';
 
 @ObjectType()
 @QueryOptions({ pagingStrategy: PagingStrategies.OFFSET })
@@ -27,6 +29,7 @@ import { DealStage } from '../deal-stages/deal-stage.entity';
 @FilterableRelation('dealContact', () => Contact, { nullable: true })
 @FilterableRelation('stage', () => DealStage, { nullable: true })
 @FilterableRelation('createdBy', () => User, { nullable: true })
+@BeforeCreateOne(CreatedByCreateOneHook)
 @Entity('deals')
 export class Deal {
   @IDField(() => ID)
@@ -42,8 +45,30 @@ export class Deal {
   value?: number;
 
   @FilterableField(() => GraphQLISODateTime, { nullable: true })
-  @Column({ type: 'timestamptz', name: 'close_date', nullable: true })
+  @Column({ type: 'timestamp', name: 'close_date', nullable: true })
   closeDate?: Date;
+
+  @FilterableField(() => Int, { nullable: true })
+  @Column({
+    type: 'int',
+    nullable: true,
+    generatedType: 'STORED',
+    asExpression: `EXTRACT(MONTH FROM "close_date")::int`,
+    insert: false,
+    update: false,
+  })
+  closeDateMonth?: number;
+
+  @FilterableField(() => Int, { nullable: true })
+  @Column({
+    type: 'int',
+    nullable: true,
+    generatedType: 'STORED',
+    asExpression: `EXTRACT(YEAR FROM "close_date")::int`,
+    insert: false,
+    update: false,
+  })
+  closeDateYear?: number;
 
   @FilterableField()
   @Column({ name: 'company_id' })

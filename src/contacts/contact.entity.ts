@@ -13,6 +13,7 @@ import {
   IDField,
   QueryOptions,
   PagingStrategies,
+  BeforeCreateOne,
 } from '@ptc-org/nestjs-query-graphql';
 import {
   ID,
@@ -21,7 +22,7 @@ import {
   registerEnumType,
 } from '@nestjs/graphql';
 import { User } from '../users/user.entity';
-import { Company } from '../companies/company.entity';
+import { CreatedByCreateOneHook } from '../common/hooks/created-by.hooks';
 
 export enum ContactStatus {
   NEW = 'NEW',
@@ -38,9 +39,9 @@ registerEnumType(ContactStatus, { name: 'ContactStatus' });
 
 @ObjectType()
 @QueryOptions({ pagingStrategy: PagingStrategies.OFFSET })
-@FilterableRelation('company', () => Company, { nullable: false })
 @FilterableRelation('salesOwner', () => User, { nullable: false })
 @FilterableRelation('createdBy', () => User, { nullable: true })
+@BeforeCreateOne(CreatedByCreateOneHook)
 @Entity('contacts')
 export class Contact {
   @IDField(() => ID)
@@ -80,12 +81,8 @@ export class Contact {
   timezone?: string;
 
   @FilterableField()
-  @Column({ name: 'company_id' })
-  companyId!: string;
-
-  @ManyToOne(() => Company)
-  @JoinColumn({ name: 'company_id' })
-  company!: Company;
+  @Column({ name: 'company_name' })
+  companyName!: string;
 
   @FilterableField()
   @Column({ name: 'sales_owner_id' })

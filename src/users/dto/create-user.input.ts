@@ -1,6 +1,6 @@
 import { InputType, Field } from '@nestjs/graphql';
 import { IsEmail, IsEnum, IsOptional, IsString } from 'class-validator';
-import { Role } from '../user.entity';
+import { Role, UserSource } from '../user.entity';
 
 @InputType('CreateUserInput')
 export class CreateUserInput {
@@ -12,19 +12,27 @@ export class CreateUserInput {
   @IsEmail()
   email!: string;
 
+  @Field()
+  @IsString()
+  phone!: string;
+
   @Field({ nullable: true })
   @IsOptional()
   @IsString()
   jobTitle?: string;
 
-  @Field({ nullable: true })
+  @Field(() => Role, { nullable: true })
   @IsOptional()
-  @IsString()
-  phone?: string;
-
-  @Field(() => Role)
   @IsEnum(Role)
-  role!: Role;
+  role?: Role;
+
+  // Sent explicitly as TASK_MEMBER by both Task Members "Add" modals.
+  // Omitted entirely by AddSalesOwnerModal, so the entity's column
+  // default (SALES_OWNER) applies — no change needed there.
+  @Field(() => UserSource, { nullable: true })
+  @IsOptional()
+  @IsEnum(UserSource)
+  source?: UserSource;
 
   @Field({ nullable: true })
   @IsOptional()
