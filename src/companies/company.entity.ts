@@ -17,6 +17,7 @@ import {
   PagingStrategies,
   BeforeCreateOne,
   BeforeCreateMany,
+  Authorize,
 } from '@ptc-org/nestjs-query-graphql';
 import {
   ID,
@@ -30,6 +31,7 @@ import {
   CreatedByCreateOneHook,
   CreatedByCreateManyHook,
 } from '../common/hooks/created-by.hooks';
+import { CompanyAuthorizer } from './company.authorizer';
 
 export enum CompanySize {
   SMALL = 'SMALL',
@@ -53,6 +55,7 @@ registerEnumType(BusinessType, { name: 'BusinessType' });
 @FilterableOffsetConnection('deals', () => Deal, { enableAggregate: true })
 @BeforeCreateOne(CreatedByCreateOneHook)
 @BeforeCreateMany(CreatedByCreateManyHook)
+@Authorize(CompanyAuthorizer)
 @Entity('companies')
 export class Company {
   @IDField(() => ID)

@@ -6,20 +6,19 @@ import {
   Parent,
   Context,
 } from '@nestjs/graphql';
+import { ForbiddenException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import DataLoader from 'dataloader';
 import { Task } from './task.entity';
-import { User } from '../users/user.entity';
+import { User, Role } from '../users/user.entity';
 import { Contact } from '../contacts/contact.entity';
 import { CreateOneTaskInput } from './dto/create-one-task.input';
 import { UpdateOneTaskInput } from './dto/update-one-task.input';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 
-// The GraphQL context object is created fresh per request in
-// app.module.ts (`context: ({ req }) => ({ req })`), so stashing loaders
-// on it here is naturally request-scoped — no cross-request leakage, no
-// changes needed to app.module.ts.
+const MANAGER_ROLES = [Role.ADMIN, Role.SALES_MANAGER];
+
 type TaskLoaderContext = {
   taskLoaders?: {
     users: DataLoader<string, User[]>;
@@ -36,11 +35,6 @@ export class TasksResolver {
     private readonly contactRepo: Repository<Contact>,
   ) {}
 
-  // Lazily creates one pair of loaders per request and reuses them across
-  // every task resolved in that request. This is what turns "one query
-  // per task" (the original N+1 bug) into "one query per request" —
-  // DataLoader automatically batches every .load(id) call made within the
-  // same tick into a single taskRepo.find({ id: In([...]) }) call.
   private getLoaders(context: TaskLoaderContext) {
     if (!context.taskLoaders) {
       context.taskLoaders = {
@@ -84,7 +78,7 @@ export class TasksResolver {
   @Mutation(() => Task)
   async createOneTask(
     @Args('input') args: CreateOneTaskInput,
-    @CurrentUser() currentUser: { sub: string; email: string },
+    @CurrentUser() currentUser: { sub: string; email: string; role: Role },
   ): Promise<Task> {
     const { userIds, contactIds, ...rest } = args.task;
 
@@ -92,30 +86,70 @@ export class TasksResolver {
       ...rest,
       createdById: currentUser?.sub,
     });
+
     if (userIds?.length) {
-      task.users = await this.userRepo.findBy({ id: In(userIds) });
+      const users = await this.userRepo.findBy({ id: In(userIds) });
+      if (users.length !== userIds.length) {
+        throw new BadRequestException(
+          'One or more selected members do not exist',
+        );
+      }
+      task.users = users;
     }
     if (contactIds?.length) {
-      task.contacts = await this.contactRepo.findBy({ id: In(contactIds) });
+      const contacts = await this.contactRepo.findBy({ id: In(contactIds) });
+      if (contacts.length !== contactIds.length) {
+        throw new BadRequestException(
+          'One or more selected contacts do not exist',
+        );
+      }
+      task.contacts = contacts;
     }
     return this.taskRepo.save(task);
   }
 
   @Mutation(() => Task)
-  async updateOneTask(@Args('input') args: UpdateOneTaskInput): Promise<Task> {
+  async updateOneTask(
+    @Args('input') args: UpdateOneTaskInput,
+    @CurrentUser() currentUser: { sub: string; email: string; role: Role },
+  ): Promise<Task> {
     const { userIds, contactIds, ...rest } = args.update;
 
-    const task = await this.taskRepo.findOneOrFail({
+    const task = await this.taskRepo.findOne({
       where: { id: args.id },
       relations: ['users', 'contacts'],
     });
+    if (!task) {
+      throw new BadRequestException('Task not found');
+    }
+
+    const isManager = MANAGER_ROLES.includes(currentUser?.role);
+    const isCreator = task.createdById === currentUser?.sub;
+    const isAssigned = task.users?.some((u) => u.id === currentUser?.sub);
+    if (!isManager && !isCreator && !isAssigned) {
+      throw new ForbiddenException(
+        'You can only update tasks you created or are assigned to',
+      );
+    }
 
     Object.assign(task, rest);
     if (userIds) {
-      task.users = await this.userRepo.findBy({ id: In(userIds) });
+      const users = await this.userRepo.findBy({ id: In(userIds) });
+      if (users.length !== userIds.length) {
+        throw new BadRequestException(
+          'One or more selected members do not exist',
+        );
+      }
+      task.users = users;
     }
     if (contactIds) {
-      task.contacts = await this.contactRepo.findBy({ id: In(contactIds) });
+      const contacts = await this.contactRepo.findBy({ id: In(contactIds) });
+      if (contacts.length !== contactIds.length) {
+        throw new BadRequestException(
+          'One or more selected contacts do not exist',
+        );
+      }
+      task.contacts = contacts;
     }
     return this.taskRepo.save(task);
   }

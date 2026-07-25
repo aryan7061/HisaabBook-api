@@ -5,6 +5,7 @@ import { Contact } from './contact.entity';
 import { CreateContactInput } from './dto/create-contact.input';
 import { UpdateContactInput } from './dto/update-contact.input';
 import { CreatedByCreateOneHook } from '../common/hooks/created-by.hooks';
+import { ContactAuthorizer } from './contact.authorizer';
 
 @Module({
   imports: [
@@ -21,6 +22,6 @@ import { CreatedByCreateOneHook } from '../common/hooks/created-by.hooks';
       ],
     }),
   ],
-  providers: [CreatedByCreateOneHook],
+  providers: [CreatedByCreateOneHook, ContactAuthorizer],
 })
 export class ContactsModule {}

@@ -15,17 +15,20 @@ import {
   IDField,
   QueryOptions,
   PagingStrategies,
+  Authorize,
 } from '@ptc-org/nestjs-query-graphql';
 import { ID, ObjectType, Field, GraphQLISODateTime } from '@nestjs/graphql';
 import { User } from '../users/user.entity';
 import { TaskStage } from '../task-stages/task-stage.entity';
 import { Contact } from '../contacts/contact.entity';
 import { CheckListItem } from './checklist-item.object';
+import { TaskAuthorizer } from './task.authorizer';
 
 @ObjectType()
 @QueryOptions({ pagingStrategy: PagingStrategies.OFFSET })
 @FilterableRelation('stage', () => TaskStage, { nullable: true })
 @FilterableRelation('createdBy', () => User, { nullable: true })
+@Authorize(TaskAuthorizer)
 @Entity('tasks')
 export class Task {
   @IDField(() => ID)
@@ -56,16 +59,10 @@ export class Task {
   @JoinColumn({ name: 'stage_id' })
   stage?: TaskStage;
 
-  // JSONB, not a table — ChecklistItemInput has no id, always replaced wholesale.
   @Field(() => [CheckListItem])
   @Column({ type: 'jsonb', default: () => "'[]'" })
   checklist!: CheckListItem[];
 
-  // Real TypeORM relation for DB-level joins. Deliberately NOT a
-  // @FilterableRelation — reads are served via the custom @ResolveField
-  // below, and writes go through the custom createOneTask/updateOneTask
-  // mutations, because the frontend sends a plain `userIds: string[]`
-  // in one call, not nestjs-query's one-at-a-time setUsersOnTask.
   @ManyToMany(() => User)
   @JoinTable({
     name: 'task_users',
@@ -74,8 +71,6 @@ export class Task {
   })
   users!: User[];
 
-  // Same pattern as `users` above — custom resolver-managed, written via
-  // a plain `contactIds: string[]`, not nestjs-query's relation setters.
   @ManyToMany(() => Contact)
   @JoinTable({
     name: 'task_contacts',

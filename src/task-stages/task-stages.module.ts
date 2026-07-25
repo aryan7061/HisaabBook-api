@@ -4,6 +4,8 @@ import { NestjsQueryTypeOrmModule } from '@ptc-org/nestjs-query-typeorm';
 import { TaskStage } from './task-stage.entity';
 import { CreateTaskStageInput } from './dto/create-task-stage.input';
 import { UpdateTaskStageInput } from './dto/update-task-stage.input';
+import { CreatedByCreateOneHook } from '../common/hooks/created-by.hooks';
+import { TaskStageAuthorizer } from './task-stage.authorizer';
 
 @Module({
   imports: [
@@ -20,5 +22,6 @@ import { UpdateTaskStageInput } from './dto/update-task-stage.input';
       ],
     }),
   ],
+  providers: [CreatedByCreateOneHook, TaskStageAuthorizer],
 })
 export class TaskStagesModule {}

@@ -14,6 +14,7 @@ import {
   QueryOptions,
   PagingStrategies,
   BeforeCreateOne,
+  Authorize,
 } from '@ptc-org/nestjs-query-graphql';
 import {
   ID,
@@ -23,6 +24,7 @@ import {
 } from '@nestjs/graphql';
 import { User } from '../users/user.entity';
 import { CreatedByCreateOneHook } from '../common/hooks/created-by.hooks';
+import { ContactAuthorizer } from './contact.authorizer';
 
 export enum ContactStatus {
   NEW = 'NEW',
@@ -42,6 +44,7 @@ registerEnumType(ContactStatus, { name: 'ContactStatus' });
 @FilterableRelation('salesOwner', () => User, { nullable: false })
 @FilterableRelation('createdBy', () => User, { nullable: true })
 @BeforeCreateOne(CreatedByCreateOneHook)
+@Authorize(ContactAuthorizer)
 @Entity('contacts')
 export class Contact {
   @IDField(() => ID)

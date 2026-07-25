@@ -8,6 +8,7 @@ import {
   CreatedByCreateOneHook,
   CreatedByCreateManyHook,
 } from '../common/hooks/created-by.hooks';
+import { CompanyAuthorizer } from './company.authorizer';
 
 @Module({
   imports: [
@@ -25,6 +26,10 @@ import {
       ],
     }),
   ],
-  providers: [CreatedByCreateOneHook, CreatedByCreateManyHook],
+  providers: [
+    CreatedByCreateOneHook,
+    CreatedByCreateManyHook,
+    CompanyAuthorizer,
+  ],
 })
 export class CompaniesModule {}

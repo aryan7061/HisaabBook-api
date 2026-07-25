@@ -12,6 +12,13 @@ import { LoginInput } from './dto/login.input';
 import { RegisterInput } from './dto/register.input';
 import { AuthResponse } from './dto/auth-response.type';
 
+// Identifies the public-facing demo account used by the frontend's "Live
+// Demo" button (see demoLogin() below). Must match the account a real user
+// registers through the app's normal /register flow — this constant does
+// not create the account, it only identifies which existing account to
+// issue a token for.
+const DEMO_ACCOUNT_EMAIL = 'demo@hisaabbook.com';
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -52,6 +59,24 @@ export class AuthService {
     const isMatch = await bcrypt.compare(input.password, user.passwordHash);
     if (!isMatch) {
       throw new UnauthorizedException('Invalid email or password');
+    }
+
+    const accessToken = this.jwtService.sign({
+      sub: user.id,
+      email: user.email,
+    });
+    return { accessToken };
+  }
+
+  // Issues a token for the fixed public demo account with no password
+  // check. Intentionally only usable for DEMO_ACCOUNT_EMAIL — this is not
+  // a general passwordless-login mechanism.
+  async demoLogin(): Promise<AuthResponse> {
+    const user = await this.usersRepository.findOne({
+      where: { email: DEMO_ACCOUNT_EMAIL },
+    });
+    if (!user) {
+      throw new UnauthorizedException('Demo account is not available');
     }
 
     const accessToken = this.jwtService.sign({

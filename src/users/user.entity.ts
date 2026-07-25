@@ -11,6 +11,7 @@ import {
   QueryOptions,
   PagingStrategies,
   BeforeCreateOne,
+  BeforeUpdateOne,
   BeforeDeleteOne,
 } from '@ptc-org/nestjs-query-graphql';
 import {
@@ -21,21 +22,15 @@ import {
 } from '@nestjs/graphql';
 import { GeneratePasswordHook } from '../common/hooks/generate-password.hook';
 import { DeleteUserGuardHook } from './hooks/delete-user-guard.hook';
+import { UserUpdateAuthorizationHook } from './hooks/user-update-authorization.hook';
+import { Role } from './role.enum';
 
-export enum Role {
-  ADMIN = 'ADMIN',
-  SALES_MANAGER = 'SALES_MANAGER',
-  SALES_PERSON = 'SALES_PERSON',
-  SALES_INTERN = 'SALES_INTERN',
-}
-registerEnumType(Role, { name: 'Role' });
+// Re-exported so every existing `import { User, Role } from
+// '../users/user.entity'` elsewhere in the codebase keeps working
+// unchanged — only the *.authorizer.ts files need to import Role from
+// './role.enum' directly instead (see that file for why).
+export { Role };
 
-// Tracks which "Add" flow created this user — TASK_MEMBER for the Task
-// board's Add Member modals (per-task panel + global Team Members
-// panel), SALES_OWNER for the Companies/Contacts "Add Sales Owner"
-// modal. Existing rows (created before this distinction existed) all
-// backfill to SALES_OWNER by column default — none of them originated
-// from the Task Members flow, so none should appear there.
 export enum UserSource {
   TASK_MEMBER = 'TASK_MEMBER',
   SALES_OWNER = 'SALES_OWNER',
@@ -45,6 +40,7 @@ registerEnumType(UserSource, { name: 'UserSource' });
 @ObjectType()
 @QueryOptions({ pagingStrategy: PagingStrategies.OFFSET })
 @BeforeCreateOne(GeneratePasswordHook)
+@BeforeUpdateOne(UserUpdateAuthorizationHook)
 @BeforeDeleteOne(DeleteUserGuardHook)
 @Entity('users')
 export class User {

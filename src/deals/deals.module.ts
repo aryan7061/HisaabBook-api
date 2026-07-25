@@ -5,6 +5,7 @@ import { Deal } from './deal.entity';
 import { CreateDealInput } from './dto/create-deal.input';
 import { UpdateDealInput } from './dto/update-deal.input';
 import { CreatedByCreateOneHook } from '../common/hooks/created-by.hooks';
+import { DealAuthorizer } from './deal.authorizer';
 
 @Module({
   imports: [
@@ -22,6 +23,6 @@ import { CreatedByCreateOneHook } from '../common/hooks/created-by.hooks';
       ],
     }),
   ],
-  providers: [CreatedByCreateOneHook],
+  providers: [CreatedByCreateOneHook, DealAuthorizer],
 })
 export class DealsModule {}

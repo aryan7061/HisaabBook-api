@@ -14,6 +14,7 @@ import {
   QueryOptions,
   PagingStrategies,
   BeforeCreateOne,
+  Authorize,
 } from '@ptc-org/nestjs-query-graphql';
 import { ID, ObjectType, GraphQLISODateTime, Int } from '@nestjs/graphql';
 import { User } from '../users/user.entity';
@@ -21,6 +22,7 @@ import { Company } from '../companies/company.entity';
 import { Contact } from '../contacts/contact.entity';
 import { DealStage } from '../deal-stages/deal-stage.entity';
 import { CreatedByCreateOneHook } from '../common/hooks/created-by.hooks';
+import { DealAuthorizer } from './deal.authorizer';
 
 @ObjectType()
 @QueryOptions({ pagingStrategy: PagingStrategies.OFFSET })
@@ -30,6 +32,7 @@ import { CreatedByCreateOneHook } from '../common/hooks/created-by.hooks';
 @FilterableRelation('stage', () => DealStage, { nullable: true })
 @FilterableRelation('createdBy', () => User, { nullable: true })
 @BeforeCreateOne(CreatedByCreateOneHook)
+@Authorize(DealAuthorizer)
 @Entity('deals')
 export class Deal {
   @IDField(() => ID)

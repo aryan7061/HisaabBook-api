@@ -8,6 +8,7 @@ import { Contact } from '../contacts/contact.entity';
 import { CreateTaskInput } from './dto/create-task.input';
 import { UpdateTaskInput } from './dto/update-task.input';
 import { TasksResolver } from './tasks.resolver';
+import { TaskAuthorizer } from './task.authorizer';
 
 @Module({
   imports: [
@@ -27,6 +28,6 @@ import { TasksResolver } from './tasks.resolver';
       ],
     }),
   ],
-  providers: [TasksResolver],
+  providers: [TasksResolver, TaskAuthorizer],
 })
 export class TasksModule {}

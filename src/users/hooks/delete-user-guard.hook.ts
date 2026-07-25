@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import {
@@ -9,12 +13,14 @@ import { Company } from '../../companies/company.entity';
 import { Contact } from '../../contacts/contact.entity';
 import { Deal } from '../../deals/deal.entity';
 import { User } from '../user.entity';
+import { Role } from '../role.enum';
 
-// Blocks deleting a user who is still the required sales/deal owner on
-// any Company, Contact, or Deal — those FKs are NOT NULL, so deleting
-// through them would either orphan data or fail ugly at the DB layer.
-// Confirmed decision: block with a clear message, don't cascade or
-// auto-reassign.
+interface GqlContext {
+  req?: { user?: { sub: string; email: string; role: Role } };
+}
+
+const MANAGER_ROLES = [Role.ADMIN, Role.SALES_MANAGER];
+
 @Injectable()
 export class DeleteUserGuardHook implements BeforeDeleteOneHook<User> {
   constructor(
@@ -25,7 +31,17 @@ export class DeleteUserGuardHook implements BeforeDeleteOneHook<User> {
     @InjectRepository(Deal) private readonly dealRepo: Repository<Deal>,
   ) {}
 
-  async run(instance: DeleteOneInputType): Promise<DeleteOneInputType> {
+  async run(
+    instance: DeleteOneInputType,
+    context: User,
+  ): Promise<DeleteOneInputType> {
+    const caller = (context as unknown as GqlContext)?.req?.user;
+    if (!caller || !MANAGER_ROLES.includes(caller.role)) {
+      throw new ForbiddenException(
+        'Only an admin or sales manager can delete a user',
+      );
+    }
+
     const userId = instance.id as string;
 
     const [companyCount, contactCount, dealCount] = await Promise.all([

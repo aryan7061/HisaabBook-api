@@ -31,6 +31,12 @@ export class AuthResolver {
     return this.authService.login(input);
   }
 
+  @Public()
+  @Mutation(() => AuthResponse)
+  async demoLogin(): Promise<AuthResponse> {
+    return this.authService.demoLogin();
+  }
+
   @Query(() => User)
   @UseGuards(GqlAuthGuard)
   async me(

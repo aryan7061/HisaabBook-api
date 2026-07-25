@@ -13,13 +13,19 @@ import {
   IDField,
   QueryOptions,
   PagingStrategies,
+  BeforeCreateOne,
+  Authorize,
 } from '@ptc-org/nestjs-query-graphql';
 import { ID, ObjectType, GraphQLISODateTime } from '@nestjs/graphql';
 import { User } from '../users/user.entity';
+import { CreatedByCreateOneHook } from '../common/hooks/created-by.hooks';
+import { TaskStageAuthorizer } from './task-stage.authorizer';
 
 @ObjectType()
 @QueryOptions({ pagingStrategy: PagingStrategies.OFFSET })
 @FilterableRelation('createdBy', () => User, { nullable: true })
+@BeforeCreateOne(CreatedByCreateOneHook)
+@Authorize(TaskStageAuthorizer)
 @Entity('task_stages')
 export class TaskStage {
   @IDField(() => ID)

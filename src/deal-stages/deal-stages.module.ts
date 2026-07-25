@@ -5,6 +5,7 @@ import { DealStage } from './deal-stage.entity';
 import { CreateDealStageInput } from './dto/create-deal-stage.input';
 import { UpdateDealStageInput } from './dto/update-deal-stage.input';
 import { CreatedByCreateOneHook } from '../common/hooks/created-by.hooks';
+import { DealStageAuthorizer } from './deal-stage.authorizer';
 
 @Module({
   imports: [
@@ -21,6 +22,6 @@ import { CreatedByCreateOneHook } from '../common/hooks/created-by.hooks';
       ],
     }),
   ],
-  providers: [CreatedByCreateOneHook],
+  providers: [CreatedByCreateOneHook, DealStageAuthorizer],
 })
 export class DealStagesModule {}

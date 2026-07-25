@@ -6,6 +6,7 @@ import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { GeneratePasswordHook } from '../common/hooks/generate-password.hook';
 import { DeleteUserGuardHook } from './hooks/delete-user-guard.hook';
+import { UserUpdateAuthorizationHook } from './hooks/user-update-authorization.hook';
 import { CrossEntityAccessModule } from '../common/cross-entity-access.module';
 
 @Module({
@@ -24,6 +25,10 @@ import { CrossEntityAccessModule } from '../common/cross-entity-access.module';
       ],
     }),
   ],
-  providers: [GeneratePasswordHook, DeleteUserGuardHook],
+  providers: [
+    GeneratePasswordHook,
+    DeleteUserGuardHook,
+    UserUpdateAuthorizationHook,
+  ],
 })
 export class UsersModule {}
