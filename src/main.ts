@@ -16,7 +16,19 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.enableCors();
+
+  // CORS origin is env-driven so the Vercel URL can be set/updated purely
+  // via Render's dashboard, with no code change or redeploy needed later.
+  // FRONTEND_URL is a comma-separated list to support both the Vercel
+  // production domain and Vercel preview-deployment domains if needed.
+  const allowedOrigins = process.env.FRONTEND_URL
+    ? process.env.FRONTEND_URL.split(',').map((origin) => origin.trim())
+    : true; // no FRONTEND_URL set (e.g. local dev) -> allow all, matches prior behavior
+
+  app.enableCors({
+    origin: allowedOrigins,
+    credentials: true,
+  });
 
   app.useGlobalPipes(
     new ValidationPipe({
