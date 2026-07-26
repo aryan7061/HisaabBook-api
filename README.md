@@ -1,6 +1,6 @@
 # HisaabBook API
 
-Backend for [HisaabBook](https://github.com/aryan7061/HisaabBook) — a CRM for managing companies, contacts, deals, tasks, and quotes.
+Backend for [HisaabBook](https://github.com/aryan7061/HisaabBook) — a CRM for managing companies, contacts, deals, and tasks.
 
 Built with NestJS 10, GraphQL (Apollo Server 4), TypeORM, and PostgreSQL (hosted on Neon), using `@ptc-org/nestjs-query` for auto-generated CRUD resolvers matching the frontend's expected query contract exactly (offset pagination, filtering, aggregates).
 

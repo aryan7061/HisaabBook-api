@@ -28,7 +28,7 @@ const isProduction = process.env.NODE_ENV === 'production';
       type: 'postgres',
       url: process.env.DATABASE_URL,
       autoLoadEntities: true,
-      synchronize: true, // dev only — creates/updates tables automatically from entities. Switch to migrations before anything resembling production.
+      synchronize: false,
       ssl: {
         rejectUnauthorized: false, // required for Neon's connection
       },
