@@ -40,7 +40,7 @@ export enum ContactStatus {
 registerEnumType(ContactStatus, { name: 'ContactStatus' });
 
 @ObjectType()
-@QueryOptions({ pagingStrategy: PagingStrategies.OFFSET })
+@QueryOptions({ pagingStrategy: PagingStrategies.OFFSET, maxResultsSize: -1 })
 @FilterableRelation('salesOwner', () => User, { nullable: false })
 @FilterableRelation('createdBy', () => User, { nullable: true })
 @BeforeCreateOne(CreatedByCreateOneHook)

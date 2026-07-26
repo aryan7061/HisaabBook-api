@@ -22,7 +22,7 @@ import { CreatedByCreateOneHook } from '../common/hooks/created-by.hooks';
 import { TaskStageAuthorizer } from './task-stage.authorizer';
 
 @ObjectType()
-@QueryOptions({ pagingStrategy: PagingStrategies.OFFSET })
+@QueryOptions({ pagingStrategy: PagingStrategies.OFFSET, maxResultsSize: -1 })
 @FilterableRelation('createdBy', () => User, { nullable: true })
 @BeforeCreateOne(CreatedByCreateOneHook)
 @Authorize(TaskStageAuthorizer)

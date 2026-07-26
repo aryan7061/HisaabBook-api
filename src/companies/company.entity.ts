@@ -49,7 +49,7 @@ export enum BusinessType {
 registerEnumType(BusinessType, { name: 'BusinessType' });
 
 @ObjectType()
-@QueryOptions({ pagingStrategy: PagingStrategies.OFFSET })
+@QueryOptions({ pagingStrategy: PagingStrategies.OFFSET, maxResultsSize: -1 })
 @FilterableRelation('salesOwner', () => User, { nullable: false })
 @FilterableRelation('createdBy', () => User, { nullable: true })
 @FilterableOffsetConnection('deals', () => Deal, { enableAggregate: true })

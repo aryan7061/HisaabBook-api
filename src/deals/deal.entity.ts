@@ -25,7 +25,7 @@ import { CreatedByCreateOneHook } from '../common/hooks/created-by.hooks';
 import { DealAuthorizer } from './deal.authorizer';
 
 @ObjectType()
-@QueryOptions({ pagingStrategy: PagingStrategies.OFFSET })
+@QueryOptions({ pagingStrategy: PagingStrategies.OFFSET, maxResultsSize: -1 })
 @FilterableRelation('company', () => Company, { nullable: false })
 @FilterableRelation('dealOwner', () => User, { nullable: false })
 @FilterableRelation('dealContact', () => Contact, { nullable: true })

@@ -25,7 +25,7 @@ import { CreatedByCreateOneHook } from '../common/hooks/created-by.hooks';
 import { DealStageAuthorizer } from './deal-stage.authorizer';
 
 @ObjectType()
-@QueryOptions({ pagingStrategy: PagingStrategies.OFFSET })
+@QueryOptions({ pagingStrategy: PagingStrategies.OFFSET, maxResultsSize: -1 })
 @FilterableRelation('createdBy', () => User, { nullable: true })
 @FilterableOffsetConnection('deals', () => Deal, { enableAggregate: true })
 @BeforeCreateOne(CreatedByCreateOneHook)

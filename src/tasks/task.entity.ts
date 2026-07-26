@@ -25,7 +25,7 @@ import { CheckListItem } from './checklist-item.object';
 import { TaskAuthorizer } from './task.authorizer';
 
 @ObjectType()
-@QueryOptions({ pagingStrategy: PagingStrategies.OFFSET })
+@QueryOptions({ pagingStrategy: PagingStrategies.OFFSET, maxResultsSize: -1 })
 @FilterableRelation('stage', () => TaskStage, { nullable: true })
 @FilterableRelation('createdBy', () => User, { nullable: true })
 @Authorize(TaskAuthorizer)

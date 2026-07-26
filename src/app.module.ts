@@ -17,6 +17,8 @@ import { DealStagesModule } from './deal-stages/deal-stages.module';
 import { DealsModule } from './deals/deals.module';
 import { GqlAuthGuard } from './auth/guards/gql-auth.guard';
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -31,11 +33,15 @@ import { GqlAuthGuard } from './auth/guards/gql-auth.guard';
         rejectUnauthorized: false, // required for Neon's connection
       },
     }),
+    // Needed so GqlAuthGuard (registered below as APP_GUARD, which Nest
+    // constructs using AppModule's own DI graph, not AuthModule's) can
+    // inject Repository<User> for its per-request role lookup.
     TypeOrmModule.forFeature([User]),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: 'schema.gql',
-      playground: true,
+      playground: !isProduction,
+      introspection: !isProduction,
       context: ({ req }) => ({ req }),
     }),
     UsersModule,

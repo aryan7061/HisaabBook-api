@@ -115,42 +115,56 @@ export class TasksResolver {
   ): Promise<Task> {
     const { userIds, contactIds, ...rest } = args.update;
 
-    const task = await this.taskRepo.findOne({
-      where: { id: args.id },
-      relations: ['users', 'contacts'],
-    });
-    if (!task) {
-      throw new BadRequestException('Task not found');
-    }
-
-    const isManager = MANAGER_ROLES.includes(currentUser?.role);
-    const isCreator = task.createdById === currentUser?.sub;
-    const isAssigned = task.users?.some((u) => u.id === currentUser?.sub);
-    if (!isManager && !isCreator && !isAssigned) {
-      throw new ForbiddenException(
-        'You can only update tasks you created or are assigned to',
-      );
-    }
-
-    Object.assign(task, rest);
+    // Resolved before the transaction — independent existence checks,
+    // not part of the row being locked below.
+    let users: User[] | undefined;
     if (userIds) {
-      const users = await this.userRepo.findBy({ id: In(userIds) });
+      users = await this.userRepo.findBy({ id: In(userIds) });
       if (users.length !== userIds.length) {
         throw new BadRequestException(
           'One or more selected members do not exist',
         );
       }
-      task.users = users;
     }
+    let contacts: Contact[] | undefined;
     if (contactIds) {
-      const contacts = await this.contactRepo.findBy({ id: In(contactIds) });
+      contacts = await this.contactRepo.findBy({ id: In(contactIds) });
       if (contacts.length !== contactIds.length) {
         throw new BadRequestException(
           'One or more selected contacts do not exist',
         );
       }
-      task.contacts = contacts;
     }
-    return this.taskRepo.save(task);
+
+    return this.taskRepo.manager.transaction(async (manager) => {
+      const task = await manager.findOne(Task, {
+        where: { id: args.id },
+        lock: { mode: 'pessimistic_write' },
+      });
+      if (!task) {
+        throw new BadRequestException('Task not found');
+      }
+
+      const taskWithUsers = await manager.findOne(Task, {
+        where: { id: args.id },
+        relations: ['users'],
+      });
+      const assignedUsers = taskWithUsers?.users ?? [];
+
+      const isManager = MANAGER_ROLES.includes(currentUser?.role);
+      const isCreator = task.createdById === currentUser?.sub;
+      const isAssigned = assignedUsers.some((u) => u.id === currentUser?.sub);
+      if (!isManager && !isCreator && !isAssigned) {
+        throw new ForbiddenException(
+          'You can only update tasks you created or are assigned to',
+        );
+      }
+
+      Object.assign(task, rest);
+      if (users) task.users = users;
+      if (contacts) task.contacts = contacts;
+
+      return manager.save(task);
+    });
   }
 }

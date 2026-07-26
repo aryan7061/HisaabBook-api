@@ -38,7 +38,7 @@ export enum UserSource {
 registerEnumType(UserSource, { name: 'UserSource' });
 
 @ObjectType()
-@QueryOptions({ pagingStrategy: PagingStrategies.OFFSET })
+@QueryOptions({ pagingStrategy: PagingStrategies.OFFSET, maxResultsSize: -1 })
 @BeforeCreateOne(GeneratePasswordHook)
 @BeforeUpdateOne(UserUpdateAuthorizationHook)
 @BeforeDeleteOne(DeleteUserGuardHook)
