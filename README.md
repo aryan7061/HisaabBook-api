@@ -1,78 +1,282 @@
-# HisaabBook API
+# 🚀 HisaabBook API
 
-Backend for [HisaabBook](https://github.com/aryan7061/HisaabBook) — a CRM for managing companies, contacts, deals, and tasks.
+Backend for **HisaabBook**, a modern CRM application for managing **Companies, Contacts, Deals, and Tasks**.
 
-Live API: https://hisaabbook-api.onrender.com
-Website Link:- https://hisaab-book-three.vercel.app
+🔗 **Live API:** https://hisaabbook-api.onrender.com
+🌐 **Frontend:** https://hisaab-book-three.vercel.app
 
-I built this backend with NestJS, GraphQL, and PostgreSQL. It uses `@ptc-org/nestjs-query` to auto-generate CRUD resolvers, so the API supports pagination, filtering, and aggregates without writing repetitive boilerplate for every resource.
+---
 
-## Stack
-- Framework: NestJS 10
-- API: GraphQL via `@nestjs/graphql` + Apollo Server 4
-- ORM: TypeORM 0.3.x, with migrations (`synchronize` disabled in production)
-- Database: PostgreSQL (Neon, serverless), connected via Neon's pooled endpoint
-- Auth: JWT (`@nestjs/jwt` + `passport-jwt`), password hashing with `bcrypt`
-- CRUD generation: `@ptc-org/nestjs-query`
-- N+1 protection: `dataloader` for relation batching
+## ✨ Overview
 
-## Data model
-Seven entities: `User`, `Company`, `Contact`, `Deal`, `DealStage`, `Task`, `TaskStage`.
-- Users have a role (`ADMIN`, `SALES_MANAGER`, `SALES_PERSON`, `SALES_INTERN`) that drives authorization.
-- Companies, Contacts, and Deals each track a `salesOwner` and `createdBy`.
-- Deals link to a company, an owner, an optional contact, and an optional stage.
-- Tasks support a checklist (JSON), multiple assigned users, and multiple linked contacts.
-- Deal stages and task stages exist as their own entities with full CRUD in the API, but the frontend does not currently expose a UI to manage them — they're used as fixed reference data.
+HisaabBook API is built with **NestJS**, **GraphQL**, and **PostgreSQL**, providing a scalable backend for CRM operations.
 
-## Authorization
-Every resource (Companies, Contacts, Deals, Tasks) enforces ownership at the API level, not just in the UI:
+Instead of writing repetitive CRUD resolvers, the project uses **@ptc-org/nestjs-query**, enabling automatic GraphQL CRUD operations with built-in support for:
 
-- `ADMIN` and `SALES_MANAGER` can see and modify all records.
-- Every other role is restricted to records they created or own (`createdById` / `salesOwnerId` / `dealOwnerId`, depending on the resource).
+* Pagination
+* Filtering
+* Sorting
+* Aggregate queries
+* Relation handling
 
-This is enforced server-side via `@ptc-org/nestjs-query`'s authorizer hooks, so a request can't bypass scoping by editing the GraphQL query on the client.
+The backend also includes authentication, role-based authorization, migrations, DataLoader support, and production-ready architecture.
 
-## Auth
-- Email/password login and registration, JWT-based sessions.
-- A `demoLogin` mutation logs in a fixed demo account (no password) so visitors can try the app without registering. The demo account only sees its own seeded data.
-- Password reset ("forgot password") is not implemented yet — the frontend form exists but doesn't call any backend logic.
+---
+## 🏗 Architecture Flow
 
-## Environment variables
+<p align="center">
+  <img
+    src="https://github.com/user-attachments/assets/37baa152-962f-453e-8a98-076693439855"
+    alt="ER Diagram"
+    width="45%"
+  />
+  <img
+    src="https://github.com/user-attachments/assets/68241e00-d1c5-481e-a2a4-71ac54c4e187"
+    alt="Request Flow"
+    width="45%"
+  />
+</p>
+
+# 🛠 Tech Stack
+
+| Category              | Technology                   |
+| --------------------- | ---------------------------- |
+| Framework             | NestJS 10                    |
+| API                   | GraphQL, Apollo Server 4     |
+| ORM                   | TypeORM 0.3.x                |
+| Database              | PostgreSQL (Neon Serverless) |
+| Authentication        | JWT, Passport-JWT            |
+| Password Hashing      | bcrypt                       |
+| CRUD Generation       | @ptc-org/nestjs-query        |
+| Relation Optimization | DataLoader                   |
+| Deployment            | Render                       |
+
+---
+
+# ✨ Features
+
+* JWT Authentication
+* User Registration & Login
+* Demo Login
+* Role-Based Authorization
+* GraphQL API
+* Auto-generated CRUD Resolvers
+* Pagination
+* Filtering
+* Sorting
+* Aggregate Queries
+* PostgreSQL Database
+* TypeORM Migrations
+* DataLoader for N+1 Prevention
+* Production-ready Configuration
+
+---
+
+# 📦 Data Model
+
+The application contains **7 core entities**:
+
+* User
+* Company
+* Contact
+* Deal
+* DealStage
+* Task
+* TaskStage
+
+### Relationships
+
+* Users own companies, contacts, deals, and tasks.
+* Companies contain contacts and deals.
+* Deals belong to companies and can optionally reference a contact.
+* Deals belong to a deal stage.
+* Tasks support:
+
+  * JSON checklist
+  * Multiple assigned users
+  * Multiple linked contacts
+* DealStage and TaskStage are maintained as reference entities through the API.
+
+---
+
+# 🔐 Authentication
+
+The API supports:
+
+* Email & Password Registration
+* Email & Password Login
+* JWT-based Authentication
+* Password Hashing using bcrypt
+
+### Demo Login
+
+A dedicated `demoLogin` mutation allows visitors to explore the application without creating an account.
+
+The demo user only has access to its own seeded data.
+
+> **Note:** Password reset functionality is not implemented yet. The frontend contains the UI, but no backend logic currently exists.
+
+---
+
+# 🛡 Authorization
+
+Authorization is enforced **entirely on the server**, ensuring data cannot be accessed by modifying GraphQL queries from the client.
+
+### Roles
+
+* ADMIN
+* SALES_MANAGER
+* SALES_PERSON
+* SALES_INTERN
+
+### Access Rules
+
+| Role          | Access           |
+| ------------- | ---------------- |
+| ADMIN         | Full access      |
+| SALES_MANAGER | Full access      |
+| SALES_PERSON  | Own records only |
+| SALES_INTERN  | Own records only |
+
+Ownership is validated using:
+
+* createdById
+* salesOwnerId
+* dealOwnerId
+
+Authorization is implemented using **@ptc-org/nestjs-query Authorizers**.
+
+---
+
+# ⚡ GraphQL
+
+The API exposes GraphQL endpoints with support for:
+
+* CRUD Operations
+* Pagination
+* Filtering
+* Sorting
+* Aggregations
+* Nested Relations
+
+Development includes GraphQL Playground, while production disables Playground and schema introspection.
+
+---
+
+# 🌱 Environment Variables
+
+```env
 DATABASE_URL=postgresql://user:password@host/dbname?sslmode=require
-JWT_SECRET=<a random secret string>
+
+JWT_SECRET=your_secret
+
 FRONTEND_URL=https://hisaab-book-three.vercel.app
+
 NODE_ENV=production
+```
 
-- `FRONTEND_URL` controls CORS (comma-separated if you need more than one origin). If unset, CORS allows all origins — fine for local dev, not for production.
-- `NODE_ENV=production` disables the GraphQL Playground and introspection.
+| Variable     | Description                                                |
+| ------------ | ---------------------------------------------------------- |
+| DATABASE_URL | PostgreSQL connection string                               |
+| JWT_SECRET   | JWT signing secret                                         |
+| FRONTEND_URL | Allowed frontend origins (supports comma-separated values) |
+| NODE_ENV     | Enables production configuration                           |
 
-## Setup
+> If `FRONTEND_URL` is omitted, CORS allows all origins. This is useful for local development but **not recommended for production**.
+
+---
+
+# 🚀 Getting Started
+
+## Install Dependencies
+
 ```bash
 npm install
 ```
 
-Create a `.env` file as shown above, then:
+Create a `.env` file using the environment variables shown above.
+
+### Development
+
 ```bash
-# development, with watch mode
 npm run start:dev
+```
 
-# production
-npm run start:prod
-In development (`NODE_ENV` not set to `production`), the GraphQL Playground is available at `http://localhost:3000/graphql`.
+### Production
 
-## Migrations
-Schema is managed with TypeORM migrations (`synchronize` is off).
 ```bash
-npm run migration:generate -- src/migrations/<name>
+npm run build
+
+npm run start:prod
+```
+
+When running in development (`NODE_ENV` is not `production`), GraphQL Playground is available at:
+
+```
+http://localhost:3000/graphql
+```
+
+---
+
+# 🗄 Database Migrations
+
+The project uses **TypeORM Migrations**.
+
+Database synchronization is disabled in production.
+
+Generate a migration:
+
+```bash
+npm run migration:generate -- src/migrations/<migration-name>
+```
+
+Run migrations:
+
+```bash
 npm run migration:run
+```
+
+Revert the latest migration:
+
+```bash
 npm run migration:revert
 ```
 
-## Deployment
-Deployed on Render as a Node web service.
-- Build: `npm install --include=dev && npm run build`
-- Run: `npm run start:prod`
+---
 
-## License
+# ☁ Deployment
 
-No license — all rights reserved.
+The application is deployed on **Render** as a Node.js Web Service.
+
+### Build Command
+
+```bash
+npm install --include=dev && npm run build
+```
+
+### Start Command
+
+```bash
+npm run start:prod
+```
+
+---
+
+# 📌 Project Highlights
+
+* Built using NestJS modular architecture
+* GraphQL-first API
+* Automatic CRUD generation
+* Secure JWT authentication
+* Role-based authorization
+* PostgreSQL with TypeORM migrations
+* DataLoader integration for optimized relation fetching
+* Production-ready deployment on Render
+
+---
+
+# 📄 License
+
+No license has been specified.
+
+**All rights reserved.**
